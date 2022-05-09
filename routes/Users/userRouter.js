@@ -5,11 +5,12 @@ const mailer = require("../../sendMail");
 const bcrypt = require("bcrypt");
 const Account = require("../../models/Account");
 const ResetToken = require("../../models/ResetTokenModel");
-const validatorRegister = require("../../validator/validatorRegister");
+const validatorLogin = require("../../validator/validatorLogin");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 
+// Upload file ảnh
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/cmnd");
@@ -29,6 +30,7 @@ router.get("/", function (req, res, next) {
   res.json({ message: "Account Router" });
 });
 
+// Đăng nhập
 router.get("/login", function (req, res, next) {
   let type = req.flash("type");
   let error = req.flash("message");
@@ -36,48 +38,105 @@ router.get("/login", function (req, res, next) {
   res.render("login", { type: type, error: error });
 });
 
-router.post("/login", function (req, res, next) {
-  let { username, password } = req.body;
-  let acc = undefined;
-  Account.findOne({ username: username })
-    .then((account) => {
-      if (!account) {
-        throw new Error("Tài khoản chưa được đăng ký");
-      }
-      acc = account;
-      return bcrypt.compare(password, account.password);
-    })
-    .then((passwordMatch) => {
-      if (!passwordMatch) {
-        req.flash("type", "success");
-        req.flash("message", "Mật khẩu không đúng");
-        return res.redirect("/user/login");
-      }
-      const { JWT_SECRET } = process.env;
-      jwt.sign(
-        {
-          username: acc.username,
-        },
-        JWT_SECRET,
-        { expiresIn: "1h" },
-        (err, token) => {
-          if (err) {
-            throw err;
-          }
-          return res.redirect("/index");
-          // return res.json({
-          //   code: 0,
-          //   message: "Đăng nhập thành công",
-          //   token: token,
-          // });
+router.post("/login", validatorLogin, function (req, res) {
+  let result = validationResult(req);
+  if (result.errors.length === 0) {
+    let { username, password } = req.body;
+    let acc = undefined;
+    Account.findOne({ username: username })
+      .then((account) => {
+        if (!account) {
+          throw new Error("Tài khoản chưa được đăng ký");
         }
-      );
-    })
-    .catch((err) => {
-      req.flash("type", "danger");
-      req.flash("message", err.message);
-      return res.redirect("/user/login");
-    });
+        acc = account;
+        return bcrypt.compare(password, account.password);
+      })
+      .then((passwordMatch) => {
+        if (!passwordMatch) {
+          if (acc.countLogin === 3 && acc.safeAccount === true) {
+            console.log("Bị khóa 1 phút");
+
+            // Khóa tài khoản và thay đổi trạng thái tk bất thường
+            lockAccount(acc);
+            unSafeAccount(acc);
+            //Mở khóa tài khoản sau 1 phút
+            setTimeout(() => {
+              unlockAccount(acc);
+            }, 30 * 1000);
+            req.flash("type", "danger");
+            req.flash("message", "Tài khoản bị khóa 1 phút!! Vui lòng đăng nhập sau 1 phút");
+            return res.redirect("/user/login");
+          } else if (acc.countLogin >= 3 && acc.safeAccount === false) {
+            console.log("Khóa tk");
+
+            updateLogin(acc);
+            lockAccount(acc);
+            req.flash("type", "danger");
+            req.flash(
+              "message",
+              "Tài khoản bị khóa vô thời hạn!!! Vui lòng liên hệ nhân viên để hỗ trợ"
+            );
+            return res.redirect("/user/login");
+          }
+          // Tạm khóa tài khoản sau 1 phút
+          else {
+            if (acc.lockAccount === true) {
+              req.flash("type", "danger");
+              req.flash(
+                "message",
+                "Tài khoản bị khóa vô thời hạn!!! Vui lòng liên hệ nhân viên để hỗ trợ"
+              );
+              return res.redirect("/user/login");
+            } else {
+              updateLogin(acc);
+              req.flash("type", "danger");
+              req.flash("message", "Sai mật khẩu");
+              return res.redirect("/user/login");
+            }
+          }
+        } else {
+          if (acc.lockAccount === true) {
+            req.flash("type", "danger");
+            req.flash(
+              "message",
+              "Tài khoản bị khóa vô thời hạn!!! Vui lòng liên hệ nhân viên để hỗ trợ"
+            );
+            return res.redirect("/user/login");
+          } else {
+            safeAccount(acc);
+            const { JWT_SECRET } = process.env;
+            jwt.sign(
+              {
+                username: acc.username,
+              },
+              JWT_SECRET,
+              { expiresIn: "1h" },
+              (err, token) => {
+                if (err) {
+                  throw err;
+                }
+                return res.redirect("/user/");
+              }
+            );
+          }
+        }
+      })
+      .catch((err) => {
+        req.flash("type", "danger");
+        req.flash("message", err.message);
+        return res.redirect("/user/login");
+      });
+  } else {
+    let messages = result.mapped();
+    let message = "";
+    for (m in messages) {
+      message = messages[m];
+      break;
+    }
+    req.flash("type", "danger");
+    req.flash("message", message.msg);
+    res.redirect("/user/login");
+  }
 });
 
 // Đăng ký
@@ -88,11 +147,10 @@ router.get("/register", (req, res) => {
 });
 
 // POST Đăng ký
-router.post("/register", validatorRegister, uploadMultiple, async (req, res) => {
-  let result = validationResult(req);
+router.post("/register", uploadMultiple, async (req, res) => {
+  let error = validatorRegister(req);
 
   let { phone, name, email, address, birth } = req.body;
-
   let { back_IDcard, front_IDcard } = req.files;
 
   var userPhone = await Account.findOne({ phone: phone });
@@ -104,40 +162,33 @@ router.post("/register", validatorRegister, uploadMultiple, async (req, res) => 
     req.flash("message", "Số điện thoại hoặc email đã được đăng ký");
     res.redirect("/user/register");
   } else {
-    // if (result.errors.length === 0) {
-    let password = crypto.randomBytes(3).toString("hex");
-    let username = randomUsername();
-    let passwordHashed = (await bcrypt.hash(password, 10)).toString();
-    let user = new Account({
-      phone: phone,
-      name: name,
-      email: email,
-      address: address,
-      birth: birth,
-      front_IDcard: front_IDcard[0].path,
-      back_IDcard: back_IDcard[0].path,
-      username: username,
-      password: passwordHashed,
-    });
-    user.save().then(() => {
-      mailer.sendInfo(email, username, password);
-      req.flash("type", "success");
-      req.flash("message", "Đăng ký thành công");
-      return res.redirect("/user/login");
-    });
-    // } else {
-    //   let messages = result.mapped();
-    //   let message = "";
+    if (!error) {
+      let password = crypto.randomBytes(3).toString("hex");
+      let username = randomUsername();
+      let passwordHashed = (await bcrypt.hash(password, 10)).toString();
 
-    //   for (m in messages) {
-    //     message = messages[m].msg;
-    //     break;
-    //   }
-
-    //   req.flash("type", "success");
-    //   req.flash("message", message);
-    //   res.redirect("/user/register");
-    // }
+      let user = new Account({
+        phone: phone,
+        name: name,
+        email: email,
+        address: address,
+        birth: birth,
+        front_IDcard: front_IDcard[0].path,
+        back_IDcard: back_IDcard[0].path,
+        username: username,
+        password: passwordHashed,
+      });
+      user.save().then(() => {
+        mailer.sendInfo(email, username, password);
+        req.flash("type", "success");
+        req.flash("message", "Đăng ký thành công");
+        return res.redirect("/user/login");
+      });
+    } else {
+      req.flash("type", "danger");
+      req.flash("message", error);
+      res.redirect("/user/register");
+    }
   }
 });
 
@@ -178,6 +229,7 @@ router.post("/forgot", async (req, res) => {
   }
 });
 
+// Khôi phục mật khẩu
 router.get("/reset/:token", async (req, res) => {
   let token = req.params.token;
   let check = await ResetToken.findOne({ token: token });
@@ -208,7 +260,10 @@ router.post("/reset/:token", async (req, res) => {
   });
   let passwordHashed = (await bcrypt.hash(pass, 10)).toString();
 
-  await Account.findOneAndUpdate({ email: email }, { $set: { password: passwordHashed } });
+  await Account.findOneAndUpdate(
+    { email: email },
+    { $set: { password: passwordHashed, countLogin: 0 } }
+  );
   await ResetToken.findOneAndDelete({ token: token });
   return res.redirect("/user/login");
 });
@@ -219,6 +274,96 @@ function randomUsername() {
     str += Math.floor(Math.random() * 10).toString();
   }
   return str;
+}
+
+function validatorRegister(req) {
+  let msg = undefined;
+  let { phone, name, email, address, birth } = req.body;
+  console.log(phone, phone.length);
+  if (!name || name === "") {
+    return (msg = "Họ tên người dùng không được để trống");
+  } else if (name.length <= 6) {
+    return (msg = "Họ tên người dùng có ít nhất 6 kí tự");
+  } else if (!email || email === "") {
+    return (msg = "Email không được để trống");
+  } else if (!phone || phone === "") {
+    return (msg = "Số điện thoại không được để trống");
+  } else if (!Number.isInteger(parseInt(phone))) {
+    return (msg = "Số điện thoại phải là số");
+  } else if (phone.length < 10 || phone.length > 15) {
+    return (msg = "Độ dài số điện thoại không phù hợp");
+  } else if (!address || address === "") {
+    return (msg = "Địa chỉ không được để trống");
+  } else if (!birth || address === "") {
+    return (msg = "Ngày sinh không được để trống");
+  }
+
+  return msg;
+}
+function updateLogin(user) {
+  Account.findOneAndUpdate(
+    { _id: user._id },
+    { countLogin: user.countLogin + 1 },
+    (err, user) => {}
+  );
+}
+
+function lockAccount(user) {
+  Account.findOneAndUpdate(
+    { _id: user._id },
+    {
+      lockAccount: true,
+    },
+    (err, user) => {
+      if (!err) {
+      } else {
+        console.log(err);
+      }
+    }
+  );
+}
+
+function unlockAccount(user) {
+  Account.findOneAndUpdate(
+    { _id: user._id },
+    {
+      lockAccount: false,
+      countLogin: 0,
+    },
+    (err, user) => {
+      if (!err) {
+      } else {
+        console.log(err);
+      }
+    }
+  );
+}
+
+function safeAccount(user) {
+  Account.findOneAndUpdate(
+    { username: user.username },
+    {
+      countLogin: 0,
+      lockAccount: false,
+      safeAccount: true,
+    }
+  ).then((a) => {
+    // console.log(a);
+  });
+}
+function unSafeAccount(user) {
+  Account.findOneAndUpdate(
+    { _id: user._id },
+    {
+      safeAccount: false,
+    },
+    (err, user) => {
+      if (!err) {
+      } else {
+        console.log(err);
+      }
+    }
+  );
 }
 
 module.exports = router;

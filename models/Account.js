@@ -13,6 +13,9 @@ const Account = new Schema({
   password: { type: "string" },
   firstLogin: { type: "boolean", default: true },
   verifyAccount: { type: "boolean", default: false },
+  countLogin: { type: Number, default: 0 },
+  lockAccount: { type: Boolean, default: false },
+  safeAccount: { type: Boolean, default: true },
 });
 
 module.exports = mongoose.model("Account", Account);

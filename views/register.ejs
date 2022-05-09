@@ -74,12 +74,12 @@
 
             <div class="form-group">
               <p>Mặt trước CMND</p>
-              <input type="file" id="front_IDcard" name="front_IDcard" accept="image/*" />
+              <input type="file" id="front_IDcard" name="front_IDcard" accept="image/*" required />
             </div>
 
             <div class="form-group">
               <p>Mặt sau CMND</p>
-              <input type="file" id="back_IDcard" name="back_IDcard" accept="image/*" />
+              <input type="file" id="back_IDcard" name="back_IDcard" accept="image/*" required />
             </div>
             <%if(error.length > 0){ %>
             <div class="alert alert-<%=type%>"><%=error%></div>
