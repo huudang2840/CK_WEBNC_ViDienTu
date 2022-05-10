@@ -29,7 +29,7 @@ var uploadMultiple = upload.fields([
 
 router.get("/", function (req, res, next) {
   console.log(req.body);
-  let username = req.session.username;
+  let username = 322296; //Giả sử có session lưu username
   Account.findOne({ username: username }, (err, user) => {
     if (!err) {
       if (!user.firstLogin) {
@@ -330,10 +330,6 @@ router.get("/profile", checkLogin, async (req, res) => {
   console.log(req.session);
 
   res.render("profile");
-});
-
-router.get("/firstlogin", (req, res) => {
-  res.render("firstlogin");
 });
 
 function randomUsername() {

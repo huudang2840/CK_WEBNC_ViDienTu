@@ -332,10 +332,6 @@ router.get("/profile", checkLogin, async (req, res) => {
   res.render("profile");
 });
 
-router.get("/firstlogin", (req, res) => {
-  res.render("firstlogin");
-});
-
 function randomUsername() {
   let str = "";
   for (let i = 0; i <= 5; i++) {
