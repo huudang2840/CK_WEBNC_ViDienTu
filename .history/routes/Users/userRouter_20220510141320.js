@@ -208,8 +208,7 @@ router.post("/register", uploadMultiple, async (req, res) => {
 
   let { phone, name, email, address, birth } = req.body;
   let { back_IDcard, front_IDcard } = req.files;
-  front_IDcard = front_IDcard[0].path.replace("/\\/g", "/").split("public").join("");
-  back_IDcard = back_IDcard[0].path.replace("/\\/g", "/").split("public").join("");
+  back_IDcard = back_IDcard.split("upload//");
 
   var userPhone = await Account.findOne({ phone: phone });
   var userEmail = await Account.findOne({ email: email });
@@ -231,8 +230,8 @@ router.post("/register", uploadMultiple, async (req, res) => {
         email: email,
         address: address,
         birth: birth,
-        front_IDcard: front_IDcard,
-        back_IDcard: back_IDcard,
+        front_IDcard: front_IDcard[0].path,
+        back_IDcard: back_IDcard[0].path,
         username: username,
         password: passwordHashed,
       });

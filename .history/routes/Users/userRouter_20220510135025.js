@@ -14,7 +14,7 @@ const checkLogin = require("../../auth/CheckLogin");
 // Upload file ảnh
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/uploads/cmnd");
+    cb(null, "uploads/cmnd");
   },
   filename: function (req, file, cb) {
     cb(null, req.body.email + "-" + file.fieldname + "-" + Date.now() + "-" + file.originalname);
@@ -208,8 +208,6 @@ router.post("/register", uploadMultiple, async (req, res) => {
 
   let { phone, name, email, address, birth } = req.body;
   let { back_IDcard, front_IDcard } = req.files;
-  front_IDcard = front_IDcard[0].path.replace("/\\/g", "/").split("public").join("");
-  back_IDcard = back_IDcard[0].path.replace("/\\/g", "/").split("public").join("");
 
   var userPhone = await Account.findOne({ phone: phone });
   var userEmail = await Account.findOne({ email: email });
@@ -231,8 +229,8 @@ router.post("/register", uploadMultiple, async (req, res) => {
         email: email,
         address: address,
         birth: birth,
-        front_IDcard: front_IDcard,
-        back_IDcard: back_IDcard,
+        front_IDcard: front_IDcard[0].path,
+        back_IDcard: back_IDcard[0].path,
         username: username,
         password: passwordHashed,
       });
@@ -338,6 +336,7 @@ router.get("/profile", checkLogin, async (req, res) => {
       console.log(err);
     }
   }).clone();
+
   console.log(user);
   res.render("profile", { user: user });
 });

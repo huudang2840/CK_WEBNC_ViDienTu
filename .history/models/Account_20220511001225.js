@@ -17,7 +17,7 @@ const Account = new Schema({
   lockAccount: { type: Boolean, default: false },
   safeAccount: { type: Boolean, default: true },
   token: { type: "string" },
-  update_at: { type: Date, default: Date.now() },
+  update_at: { type: Date, default: new Date() },
 });
 
 module.exports = mongoose.model("Account", Account);

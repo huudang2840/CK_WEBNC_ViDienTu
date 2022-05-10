@@ -14,7 +14,7 @@ const checkLogin = require("../../auth/CheckLogin");
 // Upload file ảnh
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/uploads/cmnd");
+    cb(null, "uploads/cmnd");
   },
   filename: function (req, file, cb) {
     cb(null, req.body.email + "-" + file.fieldname + "-" + Date.now() + "-" + file.originalname);
@@ -208,8 +208,6 @@ router.post("/register", uploadMultiple, async (req, res) => {
 
   let { phone, name, email, address, birth } = req.body;
   let { back_IDcard, front_IDcard } = req.files;
-  front_IDcard = front_IDcard[0].path.replace("/\\/g", "/").split("public").join("");
-  back_IDcard = back_IDcard[0].path.replace("/\\/g", "/").split("public").join("");
 
   var userPhone = await Account.findOne({ phone: phone });
   var userEmail = await Account.findOne({ email: email });
@@ -231,8 +229,8 @@ router.post("/register", uploadMultiple, async (req, res) => {
         email: email,
         address: address,
         birth: birth,
-        front_IDcard: front_IDcard,
-        back_IDcard: back_IDcard,
+        front_IDcard: front_IDcard[0].path,
+        back_IDcard: back_IDcard[0].path,
         username: username,
         password: passwordHashed,
       });
@@ -329,17 +327,8 @@ router.post("/reset/:token", async (req, res) => {
 // Thông tin của người dùng
 router.get("/profile", checkLogin, async (req, res) => {
   let username = req.session.username;
-  console.log(username);
-  let user;
-  await Account.findOne({ username: username }, (err, u) => {
-    if (!err) {
-      user = u;
-    } else {
-      console.log(err);
-    }
-  }).clone();
-  console.log(user);
-  res.render("profile", { user: user });
+  await Account.findOne({ user: user }, (err, user) => {});
+  res.render("profile");
 });
 
 router.get("/firstlogin", (req, res) => {
