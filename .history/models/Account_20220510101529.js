@@ -12,11 +12,10 @@ const Account = new Schema({
   username: { type: "string" },
   password: { type: "string" },
   firstLogin: { type: "boolean", default: true },
-  verifyAccount: { type: "String", default: "waiting" },
+  verifyAccount: { type: "String", default: false },
   countLogin: { type: Number, default: 0 },
   lockAccount: { type: Boolean, default: false },
   safeAccount: { type: Boolean, default: true },
-  token: { type: "string" },
 });
 
 module.exports = mongoose.model("Account", Account);

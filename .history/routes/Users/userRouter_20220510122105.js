@@ -142,7 +142,7 @@ router.post("/login", validatorLogin, function (req, res) {
 // Đăng xuất
 router.post("/logout", (req, res) => {
   req.session.destroy();
-  return res.redirect("/user/login");
+  return res.redirect("/user/register");
 });
 
 // Đăng ký

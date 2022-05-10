@@ -9,7 +9,6 @@ const validatorLogin = require("../../validator/validatorLogin");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
-const checkLogin = require("../../auth/CheckLogin");
 
 // Upload file ảnh
 var storage = multer.diskStorage({
@@ -105,19 +104,20 @@ router.post("/login", validatorLogin, function (req, res) {
             return res.redirect("/user/login");
           } else {
             safeAccount(acc);
-            // const { JWT_SECRET } = process.env;
-            // let auth = jwt.sign(
-            //   {
-            //     username: acc.username,
-            //   },
-            //   JWT_SECRET,
-            //   { expiresIn: "1h" }
-            // );
-
-            var sessData = req.session;
-            sessData.username = acc.username;
-
-            return res.redirect("/user");
+            const { JWT_SECRET } = process.env;
+            jwt.sign(
+              {
+                username: acc.username,
+              },
+              JWT_SECRET,
+              { expiresIn: "1h" },
+              (err, token) => {
+                if (err) {
+                  throw err;
+                }
+                return res.redirect("/user/");
+              }
+            );
           }
         }
       })
@@ -137,12 +137,6 @@ router.post("/login", validatorLogin, function (req, res) {
     req.flash("message", message.msg);
     res.redirect("/user/login");
   }
-});
-
-// Đăng xuất
-router.post("/logout", (req, res) => {
-  req.session.destroy();
-  return res.redirect("/user/login");
 });
 
 // Đăng ký
@@ -275,10 +269,16 @@ router.post("/reset/:token", async (req, res) => {
 });
 
 // Thông tin của người dùng
-router.get("/profile", checkLogin, async (req, res) => {
-  console.log(req.session);
-
-  res.render("profile");
+router.get("/reset/:token", async (req, res) => {
+  let token = req.params.token;
+  let check = await ResetToken.findOne({ token: token });
+  if (!check) {
+    res.send("Token không hợp lệ hoặc đã hết hạn");
+  } else {
+    let type = req.flash("type");
+    let error = req.flash("message");
+    res.render("resetpassword", { type, error });
+  }
 });
 
 function randomUsername() {

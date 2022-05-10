@@ -105,19 +105,24 @@ router.post("/login", validatorLogin, function (req, res) {
             return res.redirect("/user/login");
           } else {
             safeAccount(acc);
-            // const { JWT_SECRET } = process.env;
-            // let auth = jwt.sign(
-            //   {
-            //     username: acc.username,
-            //   },
-            //   JWT_SECRET,
-            //   { expiresIn: "1h" }
-            // );
+            const { JWT_SECRET } = process.env;
+            const auth = jwt.sign(
+              {
+                username: acc.username,
+              },
+              JWT_SECRET,
+              { expiresIn: "1h" },
+              (err, token) => {
+                if (err) {
+                  throw err;
+                }
 
-            var sessData = req.session;
-            sessData.username = acc.username;
-
-            return res.redirect("/user");
+                let authorization = req.header("Authorization");
+                console.log(authorization);
+                return res.redirect("/user/");
+              }
+            );
+            console.log(auth);
           }
         }
       })
@@ -137,12 +142,6 @@ router.post("/login", validatorLogin, function (req, res) {
     req.flash("message", message.msg);
     res.redirect("/user/login");
   }
-});
-
-// Đăng xuất
-router.post("/logout", (req, res) => {
-  req.session.destroy();
-  return res.redirect("/user/login");
 });
 
 // Đăng ký
@@ -276,8 +275,6 @@ router.post("/reset/:token", async (req, res) => {
 
 // Thông tin của người dùng
 router.get("/profile", checkLogin, async (req, res) => {
-  console.log(req.session);
-
   res.render("profile");
 });
 

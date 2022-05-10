@@ -279,6 +279,7 @@ router.get("/profile", checkLogin, async (req, res) => {
   console.log(req.session);
 
   res.render("profile");
+  s;
 });
 
 function randomUsername() {

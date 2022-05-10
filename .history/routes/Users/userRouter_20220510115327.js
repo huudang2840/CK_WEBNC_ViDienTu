@@ -105,19 +105,17 @@ router.post("/login", validatorLogin, function (req, res) {
             return res.redirect("/user/login");
           } else {
             safeAccount(acc);
-            // const { JWT_SECRET } = process.env;
-            // let auth = jwt.sign(
-            //   {
-            //     username: acc.username,
-            //   },
-            //   JWT_SECRET,
-            //   { expiresIn: "1h" }
-            // );
+            const { JWT_SECRET } = process.env;
+            console.log(JWT_SECRET);
+            let auth = jwt.sign(
+              {
+                username: acc.username,
+              },
+              JWT_SECRET,
+              { expiresIn: "1h" }
+            );
 
-            var sessData = req.session;
-            sessData.username = acc.username;
-
-            return res.redirect("/user");
+            return res.json({ auth });
           }
         }
       })
@@ -137,12 +135,6 @@ router.post("/login", validatorLogin, function (req, res) {
     req.flash("message", message.msg);
     res.redirect("/user/login");
   }
-});
-
-// Đăng xuất
-router.post("/logout", (req, res) => {
-  req.session.destroy();
-  return res.redirect("/user/login");
 });
 
 // Đăng ký
@@ -275,8 +267,8 @@ router.post("/reset/:token", async (req, res) => {
 });
 
 // Thông tin của người dùng
-router.get("/profile", checkLogin, async (req, res) => {
-  console.log(req.session);
+router.get("/profile", async (req, res) => {
+  console.log(req.header("Authorization"));
 
   res.render("profile");
 });

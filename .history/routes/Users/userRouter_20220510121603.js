@@ -275,7 +275,7 @@ router.post("/reset/:token", async (req, res) => {
 });
 
 // Thông tin của người dùng
-router.get("/profile", checkLogin, async (req, res) => {
+router.get("/profile", checkLogin async (req, res) => {
   console.log(req.session);
 
   res.render("profile");

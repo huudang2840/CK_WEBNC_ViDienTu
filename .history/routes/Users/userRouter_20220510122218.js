@@ -139,10 +139,15 @@ router.post("/login", validatorLogin, function (req, res) {
   }
 });
 
+router.get("/logout", (req, res) => {
+  req.session.destroy();
+  return res.render("login");
+});
+
 // Đăng xuất
 router.post("/logout", (req, res) => {
   req.session.destroy();
-  return res.redirect("/user/login");
+  return res.render("login");
 });
 
 // Đăng ký

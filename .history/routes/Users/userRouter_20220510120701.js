@@ -139,12 +139,6 @@ router.post("/login", validatorLogin, function (req, res) {
   }
 });
 
-// Đăng xuất
-router.post("/logout", (req, res) => {
-  req.session.destroy();
-  return res.redirect("/user/login");
-});
-
 // Đăng ký
 router.get("/register", (req, res) => {
   let type = req.flash("type");
@@ -275,7 +269,7 @@ router.post("/reset/:token", async (req, res) => {
 });
 
 // Thông tin của người dùng
-router.get("/profile", checkLogin, async (req, res) => {
+router.get("/profile", async (req, res) => {
   console.log(req.session);
 
   res.render("profile");

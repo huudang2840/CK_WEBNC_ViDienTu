@@ -139,6 +139,10 @@ router.post("/login", validatorLogin, function (req, res) {
   }
 });
 
+router.post("/logout", (req, res) => {
+  req.session.destroy();
+  return res.redirect("/user/login");
+});
 // Đăng xuất
 router.post("/logout", (req, res) => {
   req.session.destroy();
