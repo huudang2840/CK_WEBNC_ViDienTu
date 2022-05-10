@@ -27,8 +27,62 @@ var uploadMultiple = upload.fields([
 ]);
 
 router.get("/", function (req, res, next) {
-  res.json({ message: "Account Router" });
+  console.log(req.body)
+  let username = 322296 //Giả sử có session lưu username
+  Account.findOne({username : username},(err, user)=>{
+    if (!err) {
+      if(!user.firstLogin){
+        return res.render("home")
+      }
+      else if(user.firstLogin) {
+        return res.redirect("/user/firstlogin")
+      }
+    } else {
+      console.log("err");
+    }
+  })
+  // res.json({ message: "Account Router" });
 });
+
+
+//Đổi mật khẩu
+router.get("/changepassword", (req, res) => {
+  let type = req.flash("type");
+  let error = req.flash("message");
+  res.render("changepassword",{ type: type, error: error })
+})
+
+router.post("/changepassword",  async (req, res) => {
+  let username = 322296 //Giả sử có session lưu username
+  let {pass_old, pass_new, confirm_pass, } = req.body;
+  let acc = undefined;
+    Account.findOne({ username : username})
+    .then( (account)=> {
+      acc = account.email
+      return bcrypt.compare(pass_old, account.password);
+    })
+    .then(async (matchPasswords) => {
+      if(!matchPasswords){
+        req.flash("type", "danger");
+        req.flash("message", "Mật khẩu cũ không chính xác");
+        return res.redirect("/user/changepassword");
+      }
+      else if (pass_new !== confirm_pass) {
+        req.flash("type", "danger");
+        req.flash("message", "Mật khẩu không trùng khớp");
+        return res.redirect("/user/changepassword");
+      }
+      else {
+        let passwordHashed = (await bcrypt.hash(pass_new, 10)).toString();
+
+        console.log(passwordHashed)
+        await Account.findOneAndUpdate({username: username}, {$set: {password: passwordHashed, firstLogin: false}})
+        return res.send("Đổi mk thành công")
+      }
+    })
+})
+
+
 
 // Đăng nhập
 router.get("/login", function (req, res, next) {
@@ -37,6 +91,13 @@ router.get("/login", function (req, res, next) {
 
   res.render("login", { type: type, error: error });
 });
+
+
+
+
+
+
+
 
 router.post("/login", validatorLogin, function (req, res) {
   let result = validationResult(req);
@@ -267,6 +328,68 @@ router.post("/reset/:token", async (req, res) => {
   await ResetToken.findOneAndDelete({ token: token });
   return res.redirect("/user/login");
 });
+
+
+// Check lần đầu đăng nhập
+router.get("/firstlogin",(req, res)=>{
+  res.render("firstlogin",)
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function randomUsername() {
   let str = "";
