@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Mua thẻ cào</h2>
+      <form method="POST">
+        <p>Chọn nhà mạng</p>
+        <input type="radio" id="mobi" name="phone_card" value="mobi">
+        <label for="mobi">Mobifone</label><br>
+        <input type="radio" id="vt" name="phone_card" value="vt">
+        <label for="vt">Viettel</label><br>
+        <input type="radio" id="vina" name="phone_card" value="vina">
+        <label for="vina">Vinaphone</label><br>
+        </div>
+        <div class="form-group">
+            <p>Chọn mệnh giá</p>
+            <input type="radio" id="10000" name="money_card" value="10000">
+            <label for="mobi">10,000đ</label><br>
+            <input type="radio" id="20000" name="money_card" value="20000">
+            <label for="vt">20,000đ</label><br>
+            <input type="radio" id="50000" name="money_card" value="50000">
+            <label for="vt">50,000đ</label><br>
+            <input type="radio" id="100000" name="money_card" value="100000">
+            <label for="vt">100,000đ</label><br>
+
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Ghi chú</label>
+          <input type="text" class="form-control" id="notes" placeholder="Ghi" name="notes" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Thực hiện</button>
+      </form>
+    </div>
+  </body>
+</html>

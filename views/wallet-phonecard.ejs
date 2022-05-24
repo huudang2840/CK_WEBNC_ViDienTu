@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Phone Card</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Mua thẻ cào</h2>
+      <form method="POST">
+        <div class="form-group">
+          <p>Chọn nhà mạng</p>
+          <input type="radio" id="vt" name="code_card" value="11111" />
+          <label for="vt">Viettel</label><br />
+          <input type="radio" id="mobi" name="code_card" value="22222" />
+          <label for="mobi">Mobifone</label><br />
+          <input type="radio" id="vina" name="code_card" value="33333" />
+          <label for="vina">Vinaphone</label><br />
+        </div>
+        <div class="form-group">
+          <p>Chọn mệnh giá</p>
+          <input type="radio" id="10000" name="money_card" value="10000" />
+          <label for="10000">10,000đ</label><br />
+          <input type="radio" id="20000" name="money_card" value="20000" />
+          <label for="20000">20,000đ</label><br />
+          <input type="radio" id="50000" name="money_card" value="50000" />
+          <label for="50000">50,000đ</label><br />
+          <input type="radio" id="100000" name="money_card" value="100000" />
+          <label for="100000">100,000đ</label><br />
+        </div>
+        <div class="form-group">
+          <label for="number_card">Số lượng</label>
+          <select id="number_card" name="number_card">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Thực hiện</button>
+      </form>
+    </div>
+  </body>
+</html>
