@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Phone Card</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Thông tin chi tiết giao dịch</h2>
+      <h4>icon</h4>
+      <h4>Loại giao dịch: <%= history.type%></h4>
+      <% if (phone_card) {%>
+      <h4>Mã thẻ điện thoại:</h4>
+      <h4><%= phone_card.name %></h4>
+      <h4><%= phone_card.seri %></h4>
+      <h4><%= phone_card.seri %></h4>
+
+      <%}%>
+
+      <h4>Từ: <%= history.from%></h4>
+      <h4>Đến: <%= history.to%></h4>
+      <h4>Phí: <%= history.fee%></h4>
+      <h4>Tiền giao dịch(Đã trừ phí):</h4>
+      <h4 class="totalBill">
+        <%= history.add_money %>,<%= history.sub_money %>,<%= history.fee %>
+      </h4>
+      <h4>Số dư sau khi giao dịch: <%= history.wallet_balance %></h4>
+      <h4>Nội dung:<%= history.contents %></h4>
+      <h4>Trạng thái:<%= history.status %></h4>
+
+      <h4>Ngày tạo: <%= history.create_at %></h4>
+    </div>
+  </body>
+  <script src="/javascripts/main.js"></script>
+</html>
