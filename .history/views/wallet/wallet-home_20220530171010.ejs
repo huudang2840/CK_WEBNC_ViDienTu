@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Home Wallet</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+  </head>
+  <body>
+    <%- include('header') %>
+
+    <div class="container">
+
+        <h2>Thông tin thẻ</h2>
+      <div>
+        <p>Họ và tên:  <%= user.name %></p>
+      </div>
+      <div>
+        <p>Số dư:  <%= wallet.account_balance  %></p>
+      </div>
+       
+        <h2>Chức năng của thẻ</h2>
+
+        <div>
+         <a href="/recharge">Nạp tiền</a>
+        </div>
+        <div>
+         <a href="/withdraw">Rút tiền</a>
+        </div>
+        <div>
+         <a href="/transfer">Chuyển tiền</a>
+        </div>
+        <div>
+         <a href="/phonecard">Mua thẻ điện thoại</a>
+        </div>
+        <div>
+         <a href="/history">Lịch sử giao dịch</a>
+        </div>
+
+      </div>
+      <form action = "/user/logout" method = "POST">
+        <button class = "btn btn-primary" type="submit">Đăng xuất</button>
+    <form>
+
+  </body>
+</html>
