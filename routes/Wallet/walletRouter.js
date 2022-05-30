@@ -26,12 +26,16 @@ router.get("/", checkLogin, async function (req, res, next) {
   } catch (err) {
     console.log(err);
   }
-  res.render("home-wallet", { wallet: wallet, user: value, title: "Wallet" });
+  res.render("wallet/wallet-home", { wallet: wallet, user: value, title: "Wallet" });
 });
 
 // Nạp tiền
-router.get("/recharge", checkLogin, function (req, res, next) {
-  res.render("wallet-recharge", { title: "Wallet" });
+router.get("/recharge", checkLogin, async function (req, res, next) {
+  let username = req.session.username;
+  let user = await Account.findOne({ username: username });
+  let wallet = await Wallet.findOne({ owner: username });
+
+  res.render("wallet/wallet-recharge", { wallet: wallet, user: user, title: "Nạp tiền" });
 });
 
 router.post("/recharge", checkLogin, async function (req, res, next) {
@@ -75,8 +79,12 @@ router.post("/recharge", checkLogin, async function (req, res, next) {
 });
 
 // Rút tiền
-router.get("/withdraw", checkLogin, function (req, res, next) {
-  res.render("wallet-withdraw", { title: "Wallet" });
+router.get("/withdraw", checkLogin, async function (req, res, next) {
+  let username = req.session.username;
+  let user = await Account.findOne({ username: username });
+  let wallet = await Wallet.findOne({ owner: username });
+
+  res.render("wallet/wallet-withdraw", { wallet: wallet, user: user, title: "Rut tiền" });
 });
 
 router.post("/withdraw", checkLogin, async function (req, res, next) {
@@ -150,8 +158,11 @@ router.post("/withdraw", checkLogin, async function (req, res, next) {
 });
 
 // Chuyển tiền
-router.get("/transfer", checkLogin, function (req, res, next) {
-  res.render("wallet-transfer", { title: "Wallet" });
+router.get("/transfer", checkLogin, async function (req, res, next) {
+  let username = req.session.username;
+  let user = await Account.findOne({ username: username });
+  let wallet = await Wallet.findOne({ owner: username });
+  res.render("wallet/wallet-transfer", { wallet: wallet, user: user, title: "Chuyển tiền" });
 });
 
 router.post("/transfer", checkLogin, async function (req, res, next) {
@@ -171,7 +182,14 @@ router.post("/transfer", checkLogin, async function (req, res, next) {
   } else {
     // let walletReceive = await Wallet.findOne({ owner: userReceive.username }).exec();
 
-    return res.render("wallet-transfer-cofirm", { userReceive, money_transfer, notes, fee });
+    return res.render("wallet/wallet-transfer-cofirm", {
+      userReceive,
+      money_transfer,
+      notes,
+      fee,
+      user: userReceive,
+      wallet: walletUserCurrent,
+    });
   }
 });
 
@@ -343,6 +361,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
 router.post("/transfer-confirm", checkLogin, async function (req, res, next) {
   let { money_transfer, phone, notes, fee, person_pay } = req.body;
   let userCurrent = await Account.findOne({ username: req.session.username }).exec();
+  let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
 
   if (
     person_pay === "me" &&
@@ -360,7 +379,16 @@ router.post("/transfer-confirm", checkLogin, async function (req, res, next) {
     otp.save();
     mailer.sendOTP(userCurrent.email, getOTP);
 
-    return res.render("wallet-transfer-OTP", { money_transfer, phone, notes, fee, person_pay });
+    return res.render("wallet/wallet-transfer-OTP", {
+      money_transfer,
+      phone,
+      notes,
+      fee,
+      person_pay,
+      user: userCurrent,
+      wallet: walletCurrent,
+      title: "Xác nhận OTP",
+    });
   }
 });
 // Chuyển tiền
@@ -487,7 +515,7 @@ async function findWallet(owner) {
 }
 function makeHistory(type, from, to, add_money, sub_money, fee, wallet_balance, contents, status) {
   return {
-    id:  randomHistory(),
+    id: randomHistory(),
     type: type,
     from: from,
     to: to,
@@ -507,7 +535,8 @@ function randomOTP() {
 function randomPhoneCard() {
   return Math.floor(Math.random() * 90000) + 10000;
 }
+
 function randomHistory() {
-  return Math.floor(Date.now() + 100000 + Math.random() * 900000);
+  return Math.floor(100000 + Math.random() * 900000);
 }
 module.exports = router;

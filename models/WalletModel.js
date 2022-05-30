@@ -6,7 +6,7 @@ const WalletModel = new Schema({
   account_balance: { type: Number, default: 0 },
   history: [
     {
-      id: { type: String, unique: true },
+      id: { type: String, unique: true, required: true },
       type: { type: String },
       from: { type: String },
       to: { type: String },

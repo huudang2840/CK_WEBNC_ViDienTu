@@ -31,12 +31,12 @@ var uploadMultiple = upload.fields([
   { name: "back_IDcard", maxCount: 10 },
 ]);
 
-router.get("/", function (req, res, next) {
+router.get("/", checkLogin, function (req, res, next) {
   let username = req.session.username;
   Account.findOne({ username: username }, (err, user) => {
     if (!err) {
       if (!user.firstLogin) {
-        return res.redirect("/");
+        return res.redirect("/wallet");
       } else if (user.firstLogin) {
         return res.redirect("/user/firstlogin");
       }
@@ -47,13 +47,13 @@ router.get("/", function (req, res, next) {
 });
 
 //Đổi mật khẩu
-router.get("/changepassword", (req, res) => {
+router.get("/changepassword", checkLogin, (req, res) => {
   let type = req.flash("type");
   let error = req.flash("message");
-  res.render("changepassword", { type: type, error: error });
+  res.render("user/changepassword", { type: type, error: error });
 });
 
-router.post("/changepassword", async (req, res) => {
+router.post("/changepassword", checkLogin, async (req, res) => {
   let username = req.session.username;
   let { pass_old, pass_new, confirm_pass } = req.body;
   let acc = undefined;
@@ -79,7 +79,7 @@ router.post("/changepassword", async (req, res) => {
           { username: username },
           { $set: { password: passwordHashed, firstLogin: false } }
         );
-        return res.send("Đổi mk thành công");
+        return res.redirect("/wallet");
       }
     });
 });
@@ -89,7 +89,7 @@ router.get("/login",  function (req, res, next) {
   let type = req.flash("type");
   let error = req.flash("message");
 
-  res.render("login", { type: type, error: error });
+  res.render("user/login", { type: type, error: error });
 });
 
 router.post("/login", isAdmin, validatorLogin, function (req, res) {
@@ -192,17 +192,12 @@ router.post("/login", isAdmin, validatorLogin, function (req, res) {
   }
 });
 
-// Đăng xuất
-router.post("/logout", (req, res) => {
-  req.session.destroy();
-  return res.redirect("/user/login");
-});
-
 // Đăng ký
-router.get("/register", (req, res) => {
+router.get("/register/?", (req, res) => {
+  let { phone, name, email, address, birth } = req.query;
   let type = req.flash("type");
   let error = req.flash("message");
-  res.render("register", { type: type, error: error });
+  res.render("user/register", { type: type, error: error, phone, name, email, address, birth });
 });
 
 // POST Đăng ký
@@ -221,7 +216,18 @@ router.post("/register", uploadMultiple, async (req, res) => {
   if (userPhone || userEmail) {
     req.flash("type", "danger");
     req.flash("message", "Số điện thoại hoặc email đã được đăng ký");
-    res.redirect("/user/register");
+    res.redirect(
+      "/user/register/?phone=" +
+        phone +
+        "&name=" +
+        name +
+        "&email=" +
+        email +
+        "&address=" +
+        address +
+        "&birth=" +
+        birth
+    );
   } else {
     if (!error) {
       let password = crypto.randomBytes(3).toString("hex");
@@ -244,6 +250,7 @@ router.post("/register", uploadMultiple, async (req, res) => {
         mailer.sendInfo(email, username, password);
         // Sau khi tạo tài khoản sẽ tạo ví cho user
         let wallet = new Wallet({
+          history: { id: randomHistory() },
           owner: username,
         });
         wallet.save();
@@ -254,9 +261,42 @@ router.post("/register", uploadMultiple, async (req, res) => {
     } else {
       req.flash("type", "danger");
       req.flash("message", error);
-      res.redirect("/user/register");
+      res.redirect(
+        "/user/register/form?phone=" +
+          phone +
+          "name=" +
+          name +
+          "&email=" +
+          email +
+          "&address=" +
+          address +
+          "&birth=" +
+          birth
+      );
     }
   }
+});
+
+// Update CMND
+router.get("/update", checkLogin, async function (req, res, next) {
+  let username = req.session.username;
+  let user = await Account.findOne({ username: username });
+  let wallet = await Wallet.findOne({ owner: username });
+
+  res.render("wallet/update_profile", { wallet: wallet, user: user, title: "Rut tiền" });
+});
+
+router.post("/update", uploadMultiple, async (req, res) => {
+  let { back_IDcard, front_IDcard } = req.files;
+  front_IDcard = front_IDcard[0].path.replace("/\\/g", "/").split("public").join("");
+  back_IDcard = back_IDcard[0].path.replace("/\\/g", "/").split("public").join("");
+
+  let username = req.session.username;
+  await Account.findOneAndUpdate(
+    { username: username },
+    { front_IDcard: front_IDcard, back_IDcard: back_IDcard, verifyAccount: "waiting" }
+  );
+  return res.redirect("/user/profile");
 });
 
 // Quên mật khẩu
@@ -264,7 +304,7 @@ router.post("/register", uploadMultiple, async (req, res) => {
 router.get("/forgot", (req, res) => {
   let type = req.flash("type");
   let error = req.flash("message");
-  res.render("forgot-password", { error: error, type: type });
+  res.render("user/forgot-password", { error: error, type: type });
 });
 
 router.post("/forgot", async (req, res) => {
@@ -298,7 +338,6 @@ router.post("/forgot", async (req, res) => {
 });
 
 // Khôi phục mật khẩu
-
 router.get("/reset/:token", async (req, res) => {
   let token = req.params.token;
   let check = await ResetToken.findOne({ token: token });
@@ -307,7 +346,7 @@ router.get("/reset/:token", async (req, res) => {
   } else {
     let type = req.flash("type");
     let error = req.flash("message");
-    res.render("resetpassword", { type, error });
+    res.render("user/resetpassword", { type, error });
   }
 });
 
@@ -340,20 +379,19 @@ router.post("/reset/:token", async (req, res) => {
 // Thông tin của người dùng
 router.get("/profile", checkLogin, async (req, res) => {
   let username = req.session.username;
-  let user;
-  await Account.findOne({ username: username }, (err, u) => {
-    if (!err) {
-      user = u;
-    } else {
-      console.log(err);
-    }
-  }).clone();
-  console.log(user);
-  res.render("profile", { user: user });
+  let user = await Account.findOne({ username: username });
+  let wallet = await Wallet.findOne({ owner: username });
+  res.render("wallet/profile", { wallet: wallet, user: user, title: "Rut tiền" });
 });
 
-router.get("/firstlogin", (req, res) => {
-  res.render("firstlogin");
+router.get("/firstlogin", checkLogin, (req, res) => {
+  res.render("user/firstlogin");
+});
+
+// Đăng xuất
+router.post("/logout", (req, res) => {
+  req.session.destroy();
+  return res.redirect("/user/login");
 });
 
 function randomUsername() {
@@ -453,6 +491,9 @@ function unSafeAccount(user) {
   );
 }
 
+function randomHistory() {
+  return Math.floor(100000 + Math.random() * 900000);
+}
 module.exports = router;
 
 
