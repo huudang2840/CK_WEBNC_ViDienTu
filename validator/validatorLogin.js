@@ -5,9 +5,7 @@ module.exports = [
     .exists()
     .withMessage("Vui lòng nhập username")
     .notEmpty()
-    .withMessage("Không được để trống username")
-    .isNumeric()
-    .withMessage("Username phải là dãy số"),
+    .withMessage("Không được để trống username"),
 
   check("password")
     .exists()

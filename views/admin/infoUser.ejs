@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/admin/block.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Thông tin người dùng</title>
+</head>
+<body>
+    <% if(user && state) { %>
+        <div>
+            <h3>Tên: <%=user.name%></h3>
+            <h3>Username: <%=user.username%></h3>
+            <h3>Địa chỉ: <%=user.address%></h3>
+            <h3>Số điện thoại: <%=user.phone%></h3>
+            <h3>Trạng thái: <%=state%></h3>
+
+            <form action="/admin/active/<%=user.username%>" >
+                <button type="submit" class="btn btn-success">Xác minh</button>
+            </form>
+            <form action="/admin/disable/<%=user.username%>" >
+                <button type="submit" class="btn btn-danger">Hủy</button>
+            </form>
+            <form action="/admin/updating/<%=user.username%>" >
+                <button type="submit" class="btn btn-primary">Yêu cầu cập nhật</button>
+            </form>
+            <%if(block == true){%>
+           
+                <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Mở khóa</button>
+                <div class="modal fade" id="myModal" role="dialog">
+                        <div class="modal-dialog">
+                         
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Modal Header</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>Some text in the modal.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Hủy</button>
+                            <form action="/admin/unblock/<%=user.username%>"><button type="submit" class="btn btn-success">Đồng ý</button></form> 
+                        </div>
+                        </div>            
+                    </div>
+            <%}%>   
+        </div>
+    <%}%>
+    <h3>Lịch sử giao dịch</h3>
+    <table class="table table-dark">
+        <thead>
+          <tr>
+            <th scope="col">STT</th>
+            <th scope="col">Icon</th>
+            <th scope="col">Loại giao dịch</th>
+            <th scope="col">Số tiền</th>
+            <th scope="col">Thời gian thực hiện</th>
+            <th scope="col">Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+           <% if(history.length > 0){ %>
+                <% history.forEach(e=> { %>
+                    <th scope="row">1</th>
+                    <td>icon </td>
+
+                    <td>
+                        <%if(e.type === 'transfer') {%>
+                            Chuyển tiền <a href="/history/<%= e.id %>" >Chi tiết</a>
+                         <%}%>
+                         <% if(e.type === 'phonecard') {%>
+                            Mua thẻ điện thoại<a href="/history/<%= e.id %>" >Chi tiết</a>
+
+                         <%}%>
+                         <%if(e.type === 'recharge') {%>
+                            Nạp tiền <a href="/history/<%= e.id %>" >Chi tiết</a>
+
+                         <%}%>
+                    </td>
+                    <td class="totalBill"><%= e.add_money %>,<%= e.sub_money %>,<%= e.fee %></td>
+                    <td><%= e.create_at %></td>
+                    <td>    
+                        <%if(e.status === 'done') {%>
+                            Đã hoàn thành
+                         <%}%>
+                         <%if(e.status === 'deny') {%>
+                            Bị từ chối
+                         <%}%>
+                         <%if(e.status === 'waiting') {%>
+                            Đang chờ duyệt
+                         <%}%>
+                    </td>
+                  </tr>
+                  <% })%>
+            <%}%>
+         
+        </tbody>
+      </table>
+   
+  <script src="/javascripts/main.js"></script>
+    
+</body>
+</html>
+
+
+
+
+
+

@@ -6,7 +6,7 @@ const WalletModel = new Schema({
   account_balance: { type: Number, default: 0 },
   history: [
     {
-      id: { type: String, unique: true, required: true, default: randomHistory() },
+      id: { type: String, unique: true },
       type: { type: String },
       from: { type: String },
       to: { type: String },
@@ -31,7 +31,5 @@ const WalletModel = new Schema({
   update_at: { type: Date, default: Date.now() },
 });
 
-function randomHistory() {
-  return Math.floor(100000 + Math.random() * 900000);
-}
+
 module.exports = mongoose.model("wallets", WalletModel);

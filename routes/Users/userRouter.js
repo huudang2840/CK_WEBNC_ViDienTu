@@ -11,6 +11,9 @@ const crypto = require("crypto");
 // const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const checkLogin = require("../../auth/CheckLogin");
+const isAdmin = require("../../auth/isAdmin");
+
+
 
 // Upload file ảnh
 var storage = multer.diskStorage({
@@ -82,14 +85,14 @@ router.post("/changepassword", async (req, res) => {
 });
 
 // Đăng nhập
-router.get("/login", function (req, res, next) {
+router.get("/login",  function (req, res, next) {
   let type = req.flash("type");
   let error = req.flash("message");
 
   res.render("login", { type: type, error: error });
 });
 
-router.post("/login", validatorLogin, function (req, res) {
+router.post("/login", isAdmin, validatorLogin, function (req, res) {
   let result = validationResult(req);
   if (result.errors.length === 0) {
     let { username, password } = req.body;
@@ -224,7 +227,7 @@ router.post("/register", uploadMultiple, async (req, res) => {
       let password = crypto.randomBytes(3).toString("hex");
       let username = randomUsername();
       let passwordHashed = (await bcrypt.hash(password, 10)).toString();
-
+      console.log("Thông tin tài khoản:", username +" "+ password)
       let user = new Account({
         phone: phone,
         name: name,
@@ -451,3 +454,12 @@ function unSafeAccount(user) {
 }
 
 module.exports = router;
+
+
+
+
+
+
+
+
+// Sai khi chuyển tiền

@@ -83,8 +83,11 @@ router.post("/withdraw", checkLogin, async function (req, res, next) {
   let { number_card, CVV, date, sub_money, notes } = req.body;
   let username = req.session.username;
   let wallet = await findWallet(username);
-  let card = await Card.findOne({ number_card: number_card, CVV: CVV, date: date }).exec();
 
+  let card = await Card.findOne({ number_card: number_card, CVV: CVV, date: date }).exec();
+  if(wallet.account_balance < sub_money ){
+    return res.json({ message: "Số dư không đủ" });
+  }
   if (sub_money % 50000 !== 0) {
     return res.json({ message: "Só tiền rút phải là bội số của 50,0000VND" });
   }
@@ -106,8 +109,8 @@ router.post("/withdraw", checkLogin, async function (req, res, next) {
         wallet_history.push(
           makeHistory(
             "withdraw",
-            number_card,
             wallet.owner,
+            number_card,
             0,
             sub_money,
             fee,
@@ -122,8 +125,8 @@ router.post("/withdraw", checkLogin, async function (req, res, next) {
       wallet_history.push(
         makeHistory(
           "withdraw",
-          number_card,
           wallet.owner,
+          number_card,
           0,
           sub_money,
           fee,
@@ -142,6 +145,7 @@ router.post("/withdraw", checkLogin, async function (req, res, next) {
       );
       return res.json({ message: "OK" });
     }
+    //Rút tiền từ ví về card
   }
 });
 
@@ -154,9 +158,12 @@ router.post("/transfer", checkLogin, async function (req, res, next) {
   let { phone, money_transfer, notes } = req.body;
   let userReceive = await Account.findOne({ phone: phone }).exec();
   let walletUserCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
-
   let fee = (Number(money_transfer) * 5) / 100;
 
+  if(userReceive.username === walletUserCurrent.owner){
+    return res.json({ message: "Không thể gửi cho chính mình" });
+
+  }
   if (!userReceive) {
     return res.json({ message: "Thông tin người nhận không tồn tại" });
   } else if (walletUserCurrent.account_balance < money_transfer) {
@@ -394,6 +401,7 @@ router.post("/phonecard", checkLogin, async function (req, res, next) {
     return res.json({ message: "Vượt quá số lượng" });
   } else {
     walletHistory.push({
+      id: randomHistory(),
       type: "phonecard",
       sub_money: totalBill,
       fee: 0,
@@ -423,7 +431,7 @@ router.post("/phonecard", checkLogin, async function (req, res, next) {
 router.get("/history", checkLogin, async function (req, res, next) {
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
   let history = walletCurrent.history;
-  let historySort = history.sort((dateA, dateB) => dateA.create_at - dateB.create_at);
+  let historySort = history.sort((dateA, dateB) => dateB.create_at - dateA.create_at);
   res.render("wallet-history", { history: historySort });
 });
 
@@ -479,6 +487,7 @@ async function findWallet(owner) {
 }
 function makeHistory(type, from, to, add_money, sub_money, fee, wallet_balance, contents, status) {
   return {
+    id:  randomHistory(),
     type: type,
     from: from,
     to: to,
@@ -498,5 +507,7 @@ function randomOTP() {
 function randomPhoneCard() {
   return Math.floor(Math.random() * 90000) + 10000;
 }
-
+function randomHistory() {
+  return Math.floor(Date.now() + 100000 + Math.random() * 900000);
+}
 module.exports = router;

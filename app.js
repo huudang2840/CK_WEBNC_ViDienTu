@@ -9,6 +9,10 @@ const mongoose = require("mongoose");
 
 const userRouter = require("./routes/Users/userRouter");
 const walletRouter = require("./routes/Wallet/walletRouter");
+const adminRouter = require("./routes/Admin/adminRouter");
+
+
+const checkAdmin = require("./middlerwares/checkAdmin")
 
 const app = express();
 
@@ -44,8 +48,12 @@ mongoose.connect(credentials.mongo.development.connectionString, opts).then(
   }
 );
 
+
+
+
 app.use("/user", userRouter);
 app.use("/", walletRouter);
+app.use("/admin", adminRouter);
 
 // catch 404 and forward to error handler
 app.get("/", (req, res, next) => {
