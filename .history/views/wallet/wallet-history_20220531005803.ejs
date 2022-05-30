@@ -42,9 +42,9 @@
               </tr>
             </thead>
             <tbody>
-              <% for (var i = 0; i < history.length; i++) { let h = history[i];%>
+              <% history.forEach(function(h){%>
             
-                <th ><%= i %></th>
+                <th scope="row">1</th>
 
                 <% switch ( h.type ) { case 'recharge' : %>
                 <td>  <img  style=" max-width: 30px"  src="/images/s1-blue.png" alt="" /> </td>
@@ -70,16 +70,26 @@
                 <td class="totalBill"><%= h.add_money %>,<%= h.sub_money %>,<%= h.fee %></td>
                 <td><%= h.create_at %></td>
 
-                <% switch ( h.status ) { case 'waiting' : %>
-                <td>Chờ phê duyệt</td>
-                <% break; case 'done' : %>
-                <td>Hoành thành</td>
+                <% switch ( h.status ) { case 'done' : %>
+  
+
+
+                <% break; case 'withdraw' : %>
+               
+
+                <% break; case 'transfer' : %>
+           
+
+                <% break; case 'phonecard' : %>
+               
+
+               
                 <% break; } %>
-                
+                <td><%= h.status %></td>
               </tr>
         
         
-              <% }%>
+              <% })%>
             </tbody>
           </table>
           </div>

@@ -42,9 +42,9 @@
               </tr>
             </thead>
             <tbody>
-              <% for (var i = 0; i < history.length; i++) { let h = history[i];%>
+              <% history.forEach(function(h){ let i = 0%>
             
-                <th ><%= i %></th>
+                <th <%  i+1%> </th>
 
                 <% switch ( h.type ) { case 'recharge' : %>
                 <td>  <img  style=" max-width: 30px"  src="/images/s1-blue.png" alt="" /> </td>
@@ -79,7 +79,7 @@
               </tr>
         
         
-              <% }%>
+              <% })%>
             </tbody>
           </table>
           </div>

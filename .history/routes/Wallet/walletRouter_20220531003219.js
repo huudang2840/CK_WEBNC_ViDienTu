@@ -480,7 +480,7 @@ router.get("/history/:id", checkLogin, async function (req, res, next) {
   let historyDetail = history.find((item) => item.id === id);
   let phone_card = historyDetail.phone_card;
 
-  res.render("wallet/wallet-history-detail", { history: historyDetail, phone_card: phone_card });
+  res.render("wallet-history-detail", { history: historyDetail, phone_card: phone_card });
 });
 
 async function findUser(username) {

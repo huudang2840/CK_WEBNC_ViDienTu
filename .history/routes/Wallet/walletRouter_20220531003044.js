@@ -460,15 +460,9 @@ router.post("/phonecard", checkLogin, async function (req, res, next) {
 // Xem lịch sử giao dịch
 router.get("/history", checkLogin, async function (req, res, next) {
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
-  let user = await Account.findOne({ username: req.session.username });
   let history = walletCurrent.history;
   let historySort = history.sort((dateA, dateB) => dateB.create_at - dateA.create_at);
-  res.render("wallet/wallet-history", {
-    history: historySort,
-    user: user,
-    wallet: walletCurrent,
-    title: "Lịch sử giao dịch",
-  });
+  res.render("wallet/wallet-history", { history: historySort });
 });
 
 router.get("/history/:id", checkLogin, async function (req, res, next) {
@@ -480,7 +474,7 @@ router.get("/history/:id", checkLogin, async function (req, res, next) {
   let historyDetail = history.find((item) => item.id === id);
   let phone_card = historyDetail.phone_card;
 
-  res.render("wallet/wallet-history-detail", { history: historyDetail, phone_card: phone_card });
+  res.render("wallet-history-detail", { history: historyDetail, phone_card: phone_card });
 });
 
 async function findUser(username) {

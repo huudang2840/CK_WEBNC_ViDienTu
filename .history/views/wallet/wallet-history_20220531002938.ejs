@@ -27,9 +27,7 @@
         </div>
       </div>
       <div class="container">
-        <h2  style="margin-top: 20px; color: #800080">Lịch sử giao dịch</h2>
         <div class="service_container layout_padding2">
-         
           <table class="table table-dark">
             <thead>
               <tr>
@@ -42,44 +40,18 @@
               </tr>
             </thead>
             <tbody>
-              <% for (var i = 0; i < history.length; i++) { let h = history[i];%>
+              <% history.forEach(function(h){%>
             
-                <th ><%= i %></th>
-
-                <% switch ( h.type ) { case 'recharge' : %>
-                <td>  <img  style=" max-width: 30px"  src="/images/s1-blue.png" alt="" /> </td>
-                <td>Nạp tiền vào tài khoản<a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
-
-
-                <% break; case 'withdraw' : %>
-                <td> <img  style=" max-width: 30px"  src="/images/s2-blue.png" alt="" /></td>
-                <td> Rút tiền <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
-                
-
-                <% break; case 'transfer' : %>
-                <td>  <img  style=" max-width: 30px"  src="/images/s3-blue.png" alt="" /> </td>
-                <td>Chuyển tiền <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
-
-                <% break; case 'phonecard' : %>
-                <td> <img style=" max-width: 30px" src="/images/s4-blue.png" alt="" /> </td>
-                <td>Mua thẻ điện thoại <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
-
-               
-                <% break; } %>
-                
+                <th scope="row">1</th>
+                <td>icon </td>
+                <td><%= h.type %> <a href="/history/<%= h.id %>" >Chi tiết</a></td>
                 <td class="totalBill"><%= h.add_money %>,<%= h.sub_money %>,<%= h.fee %></td>
                 <td><%= h.create_at %></td>
-
-                <% switch ( h.status ) { case 'waiting' : %>
-                <td>Chờ phê duyệt</td>
-                <% break; case 'done' : %>
-                <td>Hoành thành</td>
-                <% break; } %>
-                
+                <td><%= h.status %></td>
               </tr>
         
         
-              <% }%>
+              <% })%>
             </tbody>
           </table>
           </div>
@@ -88,6 +60,29 @@
     </section>
 
     <%- include('footer') %>
+  </body>
+  <script src="/javascripts/main.js"></script>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Phone Card</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Mua thẻ cào</h2>
+      
+    </div>
   </body>
   <script src="/javascripts/main.js"></script>
 </html>

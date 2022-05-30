@@ -42,44 +42,32 @@
               </tr>
             </thead>
             <tbody>
-              <% for (var i = 0; i < history.length; i++) { let h = history[i];%>
+              <% history.forEach(function(h){%>
             
-                <th ><%= i %></th>
+                <th scope="row">1</th>
 
                 <% switch ( h.type ) { case 'recharge' : %>
-                <td>  <img  style=" max-width: 30px"  src="/images/s1-blue.png" alt="" /> </td>
-                <td>Nạp tiền vào tài khoản<a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
-
+                <td>  <img src="/images/s-4.png" alt="" class="img-1" /> </td>
 
                 <% break; case 'withdraw' : %>
-                <td> <img  style=" max-width: 30px"  src="/images/s2-blue.png" alt="" /></td>
-                <td> Rút tiền <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
-                
+                <td>  <img src="/images/s2-4.png" alt="" class="img-1" /> </td>
+                <td>  <img src="/images/s2-4.png" alt="" class="img-1" /> </td>
+
 
                 <% break; case 'transfer' : %>
-                <td>  <img  style=" max-width: 30px"  src="/images/s3-blue.png" alt="" /> </td>
-                <td>Chuyển tiền <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
-
                 <% break; case 'phonecard' : %>
-                <td> <img style=" max-width: 30px" src="/images/s4-blue.png" alt="" /> </td>
-                <td>Mua thẻ điện thoại <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
 
                
                 <% break; } %>
                 
+                <td><%= h.type %> <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
                 <td class="totalBill"><%= h.add_money %>,<%= h.sub_money %>,<%= h.fee %></td>
                 <td><%= h.create_at %></td>
-
-                <% switch ( h.status ) { case 'waiting' : %>
-                <td>Chờ phê duyệt</td>
-                <% break; case 'done' : %>
-                <td>Hoành thành</td>
-                <% break; } %>
-                
+                <td><%= h.status %></td>
               </tr>
         
         
-              <% }%>
+              <% })%>
             </tbody>
           </table>
           </div>

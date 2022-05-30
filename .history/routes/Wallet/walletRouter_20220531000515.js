@@ -93,7 +93,7 @@ router.post("/withdraw", checkLogin, async function (req, res, next) {
   let wallet = await findWallet(username);
 
   let card = await Card.findOne({ number_card: number_card, CVV: CVV, date: date }).exec();
-  if (wallet.account_balance < sub_money) {
+  if(wallet.account_balance < sub_money ){
     return res.json({ message: "Số dư không đủ" });
   }
   if (sub_money % 50000 !== 0) {
@@ -171,8 +171,9 @@ router.post("/transfer", checkLogin, async function (req, res, next) {
   let walletUserCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
   let fee = (Number(money_transfer) * 5) / 100;
 
-  if (userReceive.username === walletUserCurrent.owner) {
+  if(userReceive.username === walletUserCurrent.owner){
     return res.json({ message: "Không thể gửi cho chính mình" });
+
   }
   if (!userReceive) {
     return res.json({ message: "Thông tin người nhận không tồn tại" });
@@ -397,7 +398,7 @@ router.get("/phonecard", checkLogin, async function (req, res, next) {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
-  res.render("wallet/wallet-phonecard", { wallet: wallet, user: user, title: "Thẻ điện thoại" });
+  res.render("wallet/wallet-phonecard", { wallet: wallet, user: user, title: "Thẻ điện thoại" )
 });
 
 router.post("/phonecard", checkLogin, async function (req, res, next) {
@@ -460,15 +461,9 @@ router.post("/phonecard", checkLogin, async function (req, res, next) {
 // Xem lịch sử giao dịch
 router.get("/history", checkLogin, async function (req, res, next) {
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
-  let user = await Account.findOne({ username: req.session.username });
   let history = walletCurrent.history;
   let historySort = history.sort((dateA, dateB) => dateB.create_at - dateA.create_at);
-  res.render("wallet/wallet-history", {
-    history: historySort,
-    user: user,
-    wallet: walletCurrent,
-    title: "Lịch sử giao dịch",
-  });
+  res.render("wallet-history", { history: historySort });
 });
 
 router.get("/history/:id", checkLogin, async function (req, res, next) {
@@ -480,7 +475,7 @@ router.get("/history/:id", checkLogin, async function (req, res, next) {
   let historyDetail = history.find((item) => item.id === id);
   let phone_card = historyDetail.phone_card;
 
-  res.render("wallet/wallet-history-detail", { history: historyDetail, phone_card: phone_card });
+  res.render("wallet-history-detail", { history: historyDetail, phone_card: phone_card });
 });
 
 async function findUser(username) {
