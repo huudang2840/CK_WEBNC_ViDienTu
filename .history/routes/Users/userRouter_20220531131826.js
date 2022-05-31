@@ -407,7 +407,7 @@ router.post("/logout", (req, res) => {
 
 function randomUsername() {
   let str = "";
-  for (let i = 0; i <= 9; i++) {
+  for (let i = 0; i <= 5; i++) {
     str += Math.floor(Math.random() * 10).toString();
   }
   return str;

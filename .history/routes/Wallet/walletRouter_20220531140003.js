@@ -330,8 +330,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
             update_at: Date.now(),
           }
         );
-
-        // Gủi mail thông tin chuyển tiền
+        // Tạo bill gửi maiil
         sendMailBillTransfer(
           userReceive.email,
           userCurrent.username,
@@ -341,6 +340,15 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
           balance_after_receive,
           notes
         );
+        let billTransfer = {
+          from: userCurrent.username,
+          to: userReceive.username,
+          receive: Number(money_transfer),
+          fee: 0,
+          balance: balance_after_receive,
+          note: notes,
+        };
+        mailer.sendBillTransfer(userReceive.email, billTransfer);
 
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người gửi trả phí");
@@ -394,17 +402,6 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
             update_at: Date.now(),
           }
         );
-        // Gủi mail thông tin chuyển tiền
-        sendMailBillTransfer(
-          userReceive.email,
-          userCurrent.username,
-          userReceive.username,
-          Number(money_transfer),
-          0,
-          balance_after_receive,
-          notes
-        );
-
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người nhận trả phí");
         return res.redirect("/wallet/transfer");
@@ -714,7 +711,6 @@ function sendMailBillTransfer(email, from, to, receive, fee, balance, note) {
     fee: fee,
     balance: balance,
     note: note,
-    create_at: Date.now(),
   };
   mailer.sendBillTransfer(email, billTransfer);
 }

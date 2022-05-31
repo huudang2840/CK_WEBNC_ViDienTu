@@ -407,7 +407,7 @@ router.post("/logout", (req, res) => {
 
 function randomUsername() {
   let str = "";
-  for (let i = 0; i <= 9; i++) {
+  for (let i = 0; i <= 5; i++) {
     str += Math.floor(Math.random() * 10).toString();
   }
   return str;
@@ -449,7 +449,6 @@ function lockAccount(user) {
     { _id: user._id },
     {
       lockAccount: true,
-      update_at: Date.now(),
     },
     (err, user) => {
       if (!err) {
@@ -466,7 +465,6 @@ function unlockAccount(user) {
     {
       lockAccount: false,
       countLogin: 0,
-      update_at: Date.now(),
     },
     (err, user) => {
       if (!err) {
@@ -484,7 +482,6 @@ function safeAccount(user) {
       countLogin: 0,
       lockAccount: false,
       safeAccount: true,
-      update_at: Date.now(),
     }
   ).then((a) => {
     // console.log(a);
@@ -495,7 +492,6 @@ function unSafeAccount(user) {
     { _id: user._id },
     {
       safeAccount: false,
-      update_at: Date.now(),
     },
     (err, user) => {
       if (!err) {

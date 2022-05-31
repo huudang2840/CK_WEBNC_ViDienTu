@@ -65,7 +65,7 @@ module.exports.sendBillTransfer = async (email, bill) => {
             <p>Phí: ${bill.fee}</p>
             <p>Số dư: ${bill.balance}</p>
             <p>Nội dung: ${bill.note}</p>
-            <p>Ngày tạo: ${date}</p>
+            <p>Ngày tạo: ${day}/${month}/${year}</p>
 
     `,
   });

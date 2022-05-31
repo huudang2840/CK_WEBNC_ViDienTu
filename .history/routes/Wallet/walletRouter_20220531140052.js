@@ -714,7 +714,6 @@ function sendMailBillTransfer(email, from, to, receive, fee, balance, note) {
     fee: fee,
     balance: balance,
     note: note,
-    create_at: Date.now(),
   };
   mailer.sendBillTransfer(email, billTransfer);
 }

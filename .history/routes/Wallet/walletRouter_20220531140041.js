@@ -404,7 +404,6 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
           balance_after_receive,
           notes
         );
-
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người nhận trả phí");
         return res.redirect("/wallet/transfer");
@@ -714,7 +713,6 @@ function sendMailBillTransfer(email, from, to, receive, fee, balance, note) {
     fee: fee,
     balance: balance,
     note: note,
-    create_at: Date.now(),
   };
   mailer.sendBillTransfer(email, billTransfer);
 }

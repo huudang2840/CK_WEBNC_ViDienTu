@@ -79,7 +79,7 @@ router.post("/recharge", checkLogin, async function (req, res, next) {
     );
     await Card.findOneAndUpdate(
       { number_card: number_card, CVV: CVV },
-      { card_balance: Number(card.card_balance) - Number(add_money), update_at: Date.now() }
+      { card_balance: Number(card.card_balance) - Number(add_money) }
     );
     req.flash("type", "success");
     req.flash("message", "Nạp tiền thành công");
@@ -160,10 +160,7 @@ router.post("/withdraw", checkLogin, async function (req, res, next) {
             "waiting"
           )
         );
-        await Wallet.findOneAndUpdate(
-          { owner: username },
-          { history: wallet_history, update_at: Date.now() }
-        );
+        await Wallet.findOneAndUpdate({ owner: username }, { history: wallet_history });
         req.flash("type", "success");
         req.flash("message", "Chờ duyệt rút tiền");
         return res.redirect("/wallet/withdraw");
@@ -183,11 +180,11 @@ router.post("/withdraw", checkLogin, async function (req, res, next) {
       );
       await Wallet.findOneAndUpdate(
         { owner: username },
-        { account_balance: Number(balance_after), history: wallet_history, update_at: Date.now() }
+        { account_balance: Number(balance_after), history: wallet_history }
       );
       await Card.findOneAndUpdate(
         { number_card: number_card, CVV: CVV, date: date },
-        { card_balance: Number(card.card_balance) + Number(sub_money), update_at: Date.now() }
+        { card_balance: Number(card.card_balance) + Number(sub_money) }
       );
       req.flash("type", "success");
       req.flash("message", "Rút tiền thành công");
@@ -300,11 +297,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
 
         await Wallet.findOneAndUpdate(
           { owner: userCurrent.username },
-          {
-            account_balance: Number(balance_after_current),
-            history: wallet_history_current,
-            update_at: Date.now(),
-          }
+          { account_balance: Number(balance_after_current), history: wallet_history_current }
         );
 
         // Cập nhật ví của người nhận
@@ -324,24 +317,8 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
         );
         await Wallet.findOneAndUpdate(
           { owner: userReceive.username },
-          {
-            account_balance: Number(balance_after_receive),
-            history: wallet_history_receive,
-            update_at: Date.now(),
-          }
+          { account_balance: Number(balance_after_receive), history: wallet_history_receive }
         );
-
-        // Gủi mail thông tin chuyển tiền
-        sendMailBillTransfer(
-          userReceive.email,
-          userCurrent.username,
-          userReceive.username,
-          Number(money_transfer),
-          0,
-          balance_after_receive,
-          notes
-        );
-
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người gửi trả phí");
         return res.redirect("/wallet/transfer");
@@ -363,11 +340,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
 
         await Wallet.findOneAndUpdate(
           { owner: userCurrent.username },
-          {
-            account_balance: Number(balance_after_current),
-            history: wallet_history_current,
-            update_at: Date.now(),
-          }
+          { account_balance: Number(balance_after_current), history: wallet_history_current }
         );
 
         // Cập nhật ví của người nhận
@@ -388,23 +361,8 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
         );
         await Wallet.findOneAndUpdate(
           { owner: userReceive.username },
-          {
-            account_balance: Number(balance_after_receive),
-            history: wallet_history_receive,
-            update_at: Date.now(),
-          }
+          { account_balance: Number(balance_after_receive), history: wallet_history_receive }
         );
-        // Gủi mail thông tin chuyển tiền
-        sendMailBillTransfer(
-          userReceive.email,
-          userCurrent.username,
-          userReceive.username,
-          Number(money_transfer),
-          0,
-          balance_after_receive,
-          notes
-        );
-
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người nhận trả phí");
         return res.redirect("/wallet/transfer");
@@ -436,7 +394,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
 
         await Wallet.findOneAndUpdate(
           { owner: userCurrent.username },
-          { history: wallet_history_current, update_at: Date.now() }
+          { history: wallet_history_current }
         );
 
         req.flash("type", "success");
@@ -460,7 +418,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
 
         await Wallet.findOneAndUpdate(
           { owner: userCurrent.username },
-          { history: wallet_history_current, update_at: Date.now() }
+          { history: wallet_history_current }
         );
 
         req.flash("type", "success");
@@ -591,7 +549,6 @@ router.post("/phonecard", checkLogin, async function (req, res, next) {
       {
         account_balance: Number(walletCurrent.account_balance) - Number(totalBill),
         history: walletHistory,
-        update_at: Date.now(),
       }
     );
     console.log(nameCard, seriCard, totalBill);
@@ -704,18 +661,5 @@ function randomPhoneCard() {
 
 function randomHistory() {
   return Math.floor(100000 + Math.random() * 900000);
-}
-
-function sendMailBillTransfer(email, from, to, receive, fee, balance, note) {
-  let billTransfer = {
-    from: from,
-    to: to,
-    receive: receive,
-    fee: fee,
-    balance: balance,
-    note: note,
-    create_at: Date.now(),
-  };
-  mailer.sendBillTransfer(email, billTransfer);
 }
 module.exports = router;

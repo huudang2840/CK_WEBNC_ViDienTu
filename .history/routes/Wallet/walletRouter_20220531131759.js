@@ -300,11 +300,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
 
         await Wallet.findOneAndUpdate(
           { owner: userCurrent.username },
-          {
-            account_balance: Number(balance_after_current),
-            history: wallet_history_current,
-            update_at: Date.now(),
-          }
+          { account_balance: Number(balance_after_current), history: wallet_history_current, update_at: Date.now() }
         );
 
         // Cập nhật ví của người nhận
@@ -324,24 +320,8 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
         );
         await Wallet.findOneAndUpdate(
           { owner: userReceive.username },
-          {
-            account_balance: Number(balance_after_receive),
-            history: wallet_history_receive,
-            update_at: Date.now(),
-          }
+          { account_balance: Number(balance_after_receive), history: wallet_history_receive , update_at: Date.now()}
         );
-
-        // Gủi mail thông tin chuyển tiền
-        sendMailBillTransfer(
-          userReceive.email,
-          userCurrent.username,
-          userReceive.username,
-          Number(money_transfer),
-          0,
-          balance_after_receive,
-          notes
-        );
-
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người gửi trả phí");
         return res.redirect("/wallet/transfer");
@@ -363,11 +343,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
 
         await Wallet.findOneAndUpdate(
           { owner: userCurrent.username },
-          {
-            account_balance: Number(balance_after_current),
-            history: wallet_history_current,
-            update_at: Date.now(),
-          }
+          { account_balance: Number(balance_after_current), history: wallet_history_current , update_at: Date.now()}
         );
 
         // Cập nhật ví của người nhận
@@ -388,23 +364,8 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
         );
         await Wallet.findOneAndUpdate(
           { owner: userReceive.username },
-          {
-            account_balance: Number(balance_after_receive),
-            history: wallet_history_receive,
-            update_at: Date.now(),
-          }
+          { account_balance: Number(balance_after_receive), history: wallet_history_receive, update_at: Date.now() }
         );
-        // Gủi mail thông tin chuyển tiền
-        sendMailBillTransfer(
-          userReceive.email,
-          userCurrent.username,
-          userReceive.username,
-          Number(money_transfer),
-          0,
-          balance_after_receive,
-          notes
-        );
-
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người nhận trả phí");
         return res.redirect("/wallet/transfer");
@@ -460,7 +421,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
 
         await Wallet.findOneAndUpdate(
           { owner: userCurrent.username },
-          { history: wallet_history_current, update_at: Date.now() }
+          { history: wallet_history_current , update_at: Date.now()}
         );
 
         req.flash("type", "success");
@@ -591,7 +552,7 @@ router.post("/phonecard", checkLogin, async function (req, res, next) {
       {
         account_balance: Number(walletCurrent.account_balance) - Number(totalBill),
         history: walletHistory,
-        update_at: Date.now(),
+        , update_at: Date.now()
       }
     );
     console.log(nameCard, seriCard, totalBill);
@@ -704,18 +665,5 @@ function randomPhoneCard() {
 
 function randomHistory() {
   return Math.floor(100000 + Math.random() * 900000);
-}
-
-function sendMailBillTransfer(email, from, to, receive, fee, balance, note) {
-  let billTransfer = {
-    from: from,
-    to: to,
-    receive: receive,
-    fee: fee,
-    balance: balance,
-    note: note,
-    create_at: Date.now(),
-  };
-  mailer.sendBillTransfer(email, billTransfer);
 }
 module.exports = router;

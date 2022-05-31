@@ -51,7 +51,7 @@ module.exports.sendInfo = async (email, username, password) => {
 
 module.exports.sendBillTransfer = async (email, bill) => {
   console.log(bill);
-  let date = new Date(bill.create_at);
+  let day = bill.create_at.getDate();
   await transporter.sendMail({
     from: mailSend, // sender address
     to: email, // list of receivers
@@ -65,7 +65,7 @@ module.exports.sendBillTransfer = async (email, bill) => {
             <p>Phí: ${bill.fee}</p>
             <p>Số dư: ${bill.balance}</p>
             <p>Nội dung: ${bill.note}</p>
-            <p>Ngày tạo: ${date}</p>
+            <p>Ngày tạo: ${bill.create_at}</p>
 
     `,
   });

@@ -330,17 +330,16 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
             update_at: Date.now(),
           }
         );
-
-        // Gủi mail thông tin chuyển tiền
-        sendMailBillTransfer(
-          userReceive.email,
-          userCurrent.username,
-          userReceive.username,
-          Number(money_transfer),
-          0,
-          balance_after_receive,
-          notes
-        );
+        // Tạo bill gửi maiil
+        let billTransfer = {
+          from: userCurrent.username,
+          to: userReceive.username,
+          receive: Number(money_transfer),
+          fee: 0,
+          balance: balance_after_receive,
+          note: notes,
+        };
+        mailer.sendBillTransfer(userReceive.email, billTransfer);
 
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người gửi trả phí");
@@ -394,17 +393,6 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
             update_at: Date.now(),
           }
         );
-        // Gủi mail thông tin chuyển tiền
-        sendMailBillTransfer(
-          userReceive.email,
-          userCurrent.username,
-          userReceive.username,
-          Number(money_transfer),
-          0,
-          balance_after_receive,
-          notes
-        );
-
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người nhận trả phí");
         return res.redirect("/wallet/transfer");
@@ -706,7 +694,7 @@ function randomHistory() {
   return Math.floor(100000 + Math.random() * 900000);
 }
 
-function sendMailBillTransfer(email, from, to, receive, fee, balance, note) {
+function sendMailBillTransfer(from, to, receive, fee, balance, note) {
   let billTransfer = {
     from: from,
     to: to,
@@ -714,8 +702,7 @@ function sendMailBillTransfer(email, from, to, receive, fee, balance, note) {
     fee: fee,
     balance: balance,
     note: note,
-    create_at: Date.now(),
   };
-  mailer.sendBillTransfer(email, billTransfer);
+  mailer.sendBillTransfer(userReceive.email, billTransfer);
 }
 module.exports = router;
