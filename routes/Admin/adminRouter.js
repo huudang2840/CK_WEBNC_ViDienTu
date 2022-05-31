@@ -16,14 +16,12 @@ const checkAdmin = require("../../auth/CheckAdmin");
 // Hiển thị danh sách tài khoản đang đơi xác minh
 router.get("/", checkLogin, checkAdmin, async (req, res, next) => {
   let userUnactive = await Account.find({ verifyAccount: "waiting", lockAccount: false }).exec();
-  console.log(userUnactive);
-  return res.render("admin/account", { userUnactive: userUnactive });
+  return res.render("admin/waiting", { userUnactive: userUnactive });
 });
 
-router.get("/account", checkLogin, checkAdmin, async (req, res, next) => {
+router.get("/waiting", checkLogin, checkAdmin, async (req, res, next) => {
     let userUnactive = await Account.find({ verifyAccount: "waiting", lockAccount: false }).exec();
-    console.log(userUnactive);
-    return res.render("admin/account", { userUnactive: userUnactive });
+    return res.render("admin/waiting", { userUnactive: userUnactive });
   });
 router.get("/updating", checkLogin, checkAdmin, async (req, res, next) => {
   let userUpdating = await Account.find({ verifyAccount: "updating", lockAccount: false }).exec();
@@ -147,7 +145,9 @@ router.get("/approveTransaction", checkLogin, checkAdmin, async (req, res) => {
       }
     });
   });
-  res.render("admin/approveTransaction", { waitingTransaction: waitingTransaction });
+  let sortTransactionByMonth = sortByMonth(waitingTransaction)
+  let finalSort = sortTransactionByMonth.sort((dateA, dateB) => dateB.create_at - dateA.create_at);
+  res.render("admin/approveTransaction", { waitingTransaction: finalSort });
 });
 
 //Chi tiết của giao dịch
@@ -171,9 +171,10 @@ router.get("/acceptTransaction/:owner/:id", checkLogin, checkAdmin, async (req, 
   let id = req.params.id;
   let owner = req.params.owner;
   let a; //Lịch sử giao dịch lấy từ người gửi
-  let historyReceive = [];
+  let historyReceiver = [];
   let wallet = await Wallet.findOne({ owner: owner }).exec();
-  // console.log(wallet)
+
+
   let history = wallet.history;
   for (let i = 0; i < history.length; i++) {
     if (history[i].id === id) {
@@ -199,42 +200,68 @@ router.get("/acceptTransaction/:owner/:id", checkLogin, checkAdmin, async (req, 
   //Cập nhật số dư và lịch sử giao dịch của người thực hiện giao dịch
   let userSender_wallet = await Wallet.findOne({ username: a.from }).exec(); //Tìm thông tin ví của người gửi
   let current_balance_sender = userSender_wallet.account_balance; // Lấy số dư hiện tại của người gửi
-  let userSender_balance_ater = await Wallet.findOneAndUpdate(
-    { owner: owner },
-    {
-      account_balance:
-        Number(current_balance_sender) - Number(a.sub_money) - Number(a.fee) + Number(a.add_money),
-      history: history,
-    }
-  ).exec(); //Cập nhật số dư sau khi chuyển tiền và thêm vào lịch sử giao dịch
 
-  if (a.type === "tranfer") {
-    // Trường hợp loại giao dịch là chuyển tiền
-    //Trường hợp người nhận trả tiền phí
+
+  let userReceiver_wallet = await Wallet.findOne({ username: a.to }).exec(); //Tìm thông tin ví của người nhận
+  let current_balance_receiver = userReceiver_wallet.account_balance; // Lấy số dư hiện tại của người nhận
+
+
+
+  // Trường hợp loại giao dịch là chuyển tiền
+
+  if (a.type === "transfer") {
+
+
+
+
     if (Number(a.fee) === 0) {
-      balance_receiver_after =
-        Number(current_balance_receiver) + Number(a.sub_money) - (Number(a.sub_money) * 5) / 100;
+    //Trường hợp người nhận trả tiền phí
+    //Cập nhật số dư sau khi chuyển tiền và thêm vào lịch sử giao dịch của người thực hiện giao dịch
+      let userSender_balance_after = await Wallet.findOneAndUpdate(
+        { owner: a.from },
+        {
+          account_balance:
+            a.wallet_balance ,
+          history: history,
+        }
+      ).exec();
+
+      balance_receiver_after = Number(current_balance_receiver) + Number(a.sub_money) - ((Number(a.sub_money) * 5) / 100);
 
       historyReceiver.push(
         makeHistory(
-          "tranfer",
+          "transfer",
           a.from,
           a.to,
           Number(a.sub_money),
           0,
-          (Number(a.sub_money) * 5) / 100,
+          ((Number(a.sub_money) * 5) / 100),
           balance_receiver_after,
           a.contents,
           "done"
         )
       );
+      let userReceiver_balance_after = await Wallet.findOneAndUpdate(
+        { owner: a.to },
+        { account_balance: balance_receiver_after, history: historyReceiver }
+      );
+
     } else {
       //Trường hợp người gửi trả tiền phí
-      balance_receiver_after = Number(current_balance_receiver) + Number(a.sub_money);
+      let userSender_balance_after = await Wallet.findOneAndUpdate(
+        { owner: a.from },
+        {
+          account_balance:
+            Number(current_balance_sender) - Number(a.sub_money) - Number(a.fee),
+          history: history,
+        }
+      ).exec();
 
+
+      balance_receiver_after = Number(current_balance_receiver) + Number(a.sub_money);
       historyReceiver.push(
         makeHistory(
-          "tranfer",
+          "transfer",
           a.from,
           a.to,
           Number(a.sub_money),
@@ -246,10 +273,13 @@ router.get("/acceptTransaction/:owner/:id", checkLogin, checkAdmin, async (req, 
         )
       );
     }
-    await Wallet.findOneAndUpdate(
+    //Cập nhật số dư và lịch sử giao dịch cho người nhận
+    let userReceiver_balance_after = await Wallet.findOneAndUpdate(
       { owner: a.to },
       { account_balance: balance_receiver_after, history: historyReceiver }
     );
+
+
   } else if (a.type === "withdraw") {
     let card = await Card.findOne({ number_card: a.to }).exec();
     let card_current_balance = card.card_balance;
@@ -265,7 +295,7 @@ router.get("/acceptTransaction/:owner/:id", checkLogin, checkAdmin, async (req, 
 //Không chấp nhận giao dịch
 router.get("/deniedTransaction/:id", checkLogin, checkAdmin, async (req, res) => {
   let wallet = await Wallet.findOne({ owner: owner }).exec();
-  // console.log(wallet)
+ 
   let history = wallet.history;
   for (let i = 0; i < history.length; i++) {
     if (history[i].id === id) {
@@ -324,4 +354,19 @@ module.exports = router;
 
 
 
-sortByM
+function sortByMonth(list){
+  let transactionByMonth=[]
+  let today = new Date();
+  let current_month =  today.getMonth();
+  list.forEach(e => {
+      if(e.create_at.getMonth() === current_month)
+      transactionByMonth.push(e)
+
+  })
+
+  return transactionByMonth
+
+
+
+
+}

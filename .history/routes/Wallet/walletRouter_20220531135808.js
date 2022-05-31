@@ -5,10 +5,10 @@ const Card = require("../../models/CardModel");
 const Wallet = require("../../models/WalletModel");
 const Otp = require("../../models/OTPModel");
 const mailer = require("../../sendMail");
-const checkNotUser = require("../../auth/CheckNotUser")
+
 const checkLogin = require("../../auth/CheckLogin");
 
-router.get("/", checkLogin, checkNotUser, async function (req, res, next) {
+router.get("/", checkLogin, async function (req, res, next) {
   let username = req.session.username;
   let user = findUser(username);
   let wallet;
@@ -30,7 +30,7 @@ router.get("/", checkLogin, checkNotUser, async function (req, res, next) {
 });
 
 // Nạp tiền
-router.get("/recharge", checkLogin, checkNotUser, async function (req, res, next) {
+router.get("/recharge", checkLogin, async function (req, res, next) {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
@@ -47,7 +47,7 @@ router.get("/recharge", checkLogin, checkNotUser, async function (req, res, next
   });
 });
 
-router.post("/recharge", checkLogin, checkNotUser, async function (req, res, next) {
+router.post("/recharge", checkLogin, async function (req, res, next) {
   let { number_card, CVV, add_money } = req.body;
   let username = req.session.username;
   let wallet = await findWallet(username);
@@ -96,7 +96,7 @@ router.post("/recharge", checkLogin, checkNotUser, async function (req, res, nex
 });
 
 // Rút tiền
-router.get("/withdraw", checkLogin,checkNotUser, async function (req, res, next) {
+router.get("/withdraw", checkLogin, async function (req, res, next) {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
@@ -113,7 +113,7 @@ router.get("/withdraw", checkLogin,checkNotUser, async function (req, res, next)
   });
 });
 
-router.post("/withdraw", checkLogin, checkNotUser, async function (req, res, next) {
+router.post("/withdraw", checkLogin, async function (req, res, next) {
   let { number_card, CVV, date, sub_money, notes } = req.body;
   let username = req.session.username;
   let wallet = await findWallet(username);
@@ -198,7 +198,7 @@ router.post("/withdraw", checkLogin, checkNotUser, async function (req, res, nex
 });
 
 // Chuyển tiền
-router.get("/transfer", checkLogin, checkNotUser, async function (req, res, next) {
+router.get("/transfer", checkLogin, async function (req, res, next) {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
@@ -215,7 +215,7 @@ router.get("/transfer", checkLogin, checkNotUser, async function (req, res, next
   });
 });
 
-router.post("/transfer", checkLogin, checkNotUser, async function (req, res, next) {
+router.post("/transfer", checkLogin, async function (req, res, next) {
   let { phone, money_transfer, notes } = req.body;
   let userReceive = await Account.findOne({ phone: phone }).exec();
   let walletUserCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
@@ -255,7 +255,7 @@ router.post("/transfer", checkLogin, checkNotUser, async function (req, res, nex
 });
 
 // Xác thực OTP
-router.post("/transfer-OTP", checkLogin, checkNotUser, async function (req, res, next) {
+router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
   let { money_transfer, phone, notes, fee, person_pay, otp } = req.body;
   console.log(money_transfer, phone, notes, fee, person_pay, otp);
   let userCurrent = await Account.findOne({ username: req.session.username }).exec();
@@ -330,17 +330,16 @@ router.post("/transfer-OTP", checkLogin, checkNotUser, async function (req, res,
             update_at: Date.now(),
           }
         );
-
-        // Gủi mail thông tin chuyển tiền
-        sendMailBillTransfer(
-          userReceive.email,
-          userCurrent.username,
-          userReceive.username,
-          Number(money_transfer),
-          0,
-          balance_after_receive,
-          notes
-        );
+        // Tạo bill gửi maiil
+        let billTransfer = {
+          from: userCurrent.username,
+          to: userReceive.username,
+          receive: Number(money_transfer),
+          fee: 0,
+          balance: balance_after_receive,
+          note: notes,
+        };
+        mailer.sendBillTransfer(userReceive.email, billTransfer);
 
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người gửi trả phí");
@@ -394,17 +393,6 @@ router.post("/transfer-OTP", checkLogin, checkNotUser, async function (req, res,
             update_at: Date.now(),
           }
         );
-        // Gủi mail thông tin chuyển tiền
-        sendMailBillTransfer(
-          userReceive.email,
-          userCurrent.username,
-          userReceive.username,
-          Number(money_transfer),
-          0,
-          balance_after_receive,
-          notes
-        );
-
         req.flash("type", "success");
         req.flash("message", "Chuyển tiền thành công, người nhận trả phí");
         return res.redirect("/wallet/transfer");
@@ -479,7 +467,7 @@ router.post("/transfer-OTP", checkLogin, checkNotUser, async function (req, res,
   }
 });
 
-router.post("/transfer-confirm", checkLogin, checkNotUser, async function (req, res, next) {
+router.post("/transfer-confirm", checkLogin, async function (req, res, next) {
   let { money_transfer, phone, notes, fee, person_pay } = req.body;
   let userCurrent = await Account.findOne({ username: req.session.username }).exec();
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
@@ -519,7 +507,7 @@ router.post("/transfer-confirm", checkLogin, checkNotUser, async function (req, 
 // Chuyển tiền
 
 // Mua thẻ cào
-router.get("/phonecard", checkLogin,checkNotUser, async function (req, res, next) {
+router.get("/phonecard", checkLogin, async function (req, res, next) {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
@@ -536,7 +524,7 @@ router.get("/phonecard", checkLogin,checkNotUser, async function (req, res, next
   });
 });
 
-router.post("/phonecard", checkLogin, checkNotUser, async function (req, res, next) {
+router.post("/phonecard", checkLogin, async function (req, res, next) {
   let { code_card, money_card, number_card } = req.body;
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
   let walletHistory = walletCurrent.history;
@@ -603,7 +591,7 @@ router.post("/phonecard", checkLogin, checkNotUser, async function (req, res, ne
 // Mua thẻ cào
 
 // Xem lịch sử giao dịch
-router.get("/history", checkLogin, checkNotUser, async function (req, res, next) {
+router.get("/history", checkLogin, async function (req, res, next) {
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
   let user = await Account.findOne({ username: req.session.username });
   let history = walletCurrent.history;
@@ -622,7 +610,7 @@ router.get("/history", checkLogin, checkNotUser, async function (req, res, next)
   });
 });
 
-router.get("/history/:id", checkLogin, checkNotUser, async function (req, res, next) {
+router.get("/history/:id", checkLogin, async function (req, res, next) {
   let user = await Account.findOne({ username: req.session.username });
   let id = req.params.id;
   let walletCurrent = await Wallet.findOne({
@@ -706,16 +694,16 @@ function randomHistory() {
   return Math.floor(100000 + Math.random() * 900000);
 }
 
-function sendMailBillTransfer(email, from, to, receive, fee, balance, note) {
+function sendMailBillTransfer(from, to, receive, fee, balance, note) {
+  // Tạo bill gửi maiil
   let billTransfer = {
-    from: from,
-    to: to,
-    receive: receive,
-    fee: fee,
-    balance: balance,
-    note: note,
-    create_at: Date.now(),
+    from: userCurrent.username,
+    to: userReceive.username,
+    receive: Number(money_transfer),
+    fee: 0,
+    balance: balance_after_receive,
+    note: notes,
   };
-  mailer.sendBillTransfer(email, billTransfer);
+  mailer.sendBillTransfer(userReceive.email, billTransfer);
 }
 module.exports = router;

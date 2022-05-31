@@ -75,7 +75,7 @@ router.post("/changepassword", checkLogin, async (req, res) => {
         console.log(passwordHashed);
         await Account.findOneAndUpdate(
           { username: username },
-          { $set: { password: passwordHashed, firstLogin: false, update_at: Date.now() } }
+          { $set: { password: passwordHashed, firstLogin: false } }
         );
         return res.redirect("/wallet");
       }
@@ -147,19 +147,11 @@ router.post("/login", isAdmin, validatorLogin, function (req, res) {
             }
           }
         } else {
-          if (acc.verifyAccount === "disable") {
-            req.flash("type", "danger");
-            req.flash(
-              "message",
-              "Tài khoản này đã bị vô hiệu hóa, vui lòng liên hệ tổng đài 18001008”."
-            );
-            return res.redirect("/user/login");
-          }
           if (acc.lockAccount === true) {
             req.flash("type", "danger");
             req.flash(
               "message",
-              "Tài khoản đã bị khóa do nhập sai mật khẩu nhiều lần, vui lòng liên hệ quản trị viên để được hỗ trợ."
+              "Tài khoản bị khóa vô thời hạn!!! Vui lòng liên hệ nhân viên để hỗ trợ"
             );
             return res.redirect("/user/login");
           } else {
@@ -300,12 +292,7 @@ router.post("/update", uploadMultiple, async (req, res) => {
   let username = req.session.username;
   await Account.findOneAndUpdate(
     { username: username },
-    {
-      front_IDcard: front_IDcard,
-      back_IDcard: back_IDcard,
-      verifyAccount: "waiting",
-      update_at: Date.now(),
-    }
+    { front_IDcard: front_IDcard, back_IDcard: back_IDcard, verifyAccount: "waiting" }
   );
   return res.redirect("/user/profile");
 });
@@ -381,7 +368,7 @@ router.post("/reset/:token", async (req, res) => {
 
   await Account.findOneAndUpdate(
     { email: email },
-    { $set: { password: passwordHashed, countLogin: 0, update_at: Date.now() } }
+    { $set: { password: passwordHashed, countLogin: 0 } }
   );
   await ResetToken.findOneAndDelete({ token: token });
   return res.redirect("/user/login");
@@ -392,7 +379,7 @@ router.get("/profile", checkLogin, async (req, res) => {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
-  res.render("wallet/profile", { wallet: wallet, user: user, title: "Thông tin cá nhân" });
+  res.render("wallet/profile", { wallet: wallet, user: user, title: "Rut tiền" });
 });
 
 router.get("/firstlogin", checkLogin, (req, res) => {
@@ -407,7 +394,7 @@ router.post("/logout", (req, res) => {
 
 function randomUsername() {
   let str = "";
-  for (let i = 0; i <= 9; i++) {
+  for (let i = 0; i <= 5; i++) {
     str += Math.floor(Math.random() * 10).toString();
   }
   return str;
@@ -439,7 +426,7 @@ function validatorRegister(req) {
 function updateLogin(user) {
   Account.findOneAndUpdate(
     { _id: user._id },
-    { countLogin: user.countLogin + 1, update_at: Date.now() },
+    { countLogin: user.countLogin + 1 },
     (err, user) => {}
   );
 }
@@ -449,7 +436,6 @@ function lockAccount(user) {
     { _id: user._id },
     {
       lockAccount: true,
-      update_at: Date.now(),
     },
     (err, user) => {
       if (!err) {
@@ -466,7 +452,6 @@ function unlockAccount(user) {
     {
       lockAccount: false,
       countLogin: 0,
-      update_at: Date.now(),
     },
     (err, user) => {
       if (!err) {
@@ -484,7 +469,6 @@ function safeAccount(user) {
       countLogin: 0,
       lockAccount: false,
       safeAccount: true,
-      update_at: Date.now(),
     }
   ).then((a) => {
     // console.log(a);
@@ -495,7 +479,6 @@ function unSafeAccount(user) {
     { _id: user._id },
     {
       safeAccount: false,
-      update_at: Date.now(),
     },
     (err, user) => {
       if (!err) {

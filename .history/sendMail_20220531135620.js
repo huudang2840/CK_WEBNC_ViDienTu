@@ -50,23 +50,13 @@ module.exports.sendInfo = async (email, username, password) => {
 };
 
 module.exports.sendBillTransfer = async (email, bill) => {
-  console.log(bill);
-  let date = new Date(bill.create_at);
+  console.log(history);
   await transporter.sendMail({
     from: mailSend, // sender address
     to: email, // list of receivers
     subject: "Thông Tin giao dịch chuyển tiền", // Subject line
     text: "Hello", // plain text body
-    html: `<h3> Chuyển tiền thành công </h3>
-           <h3> Thông tin giao dịch </h3>
-           <p>Người gửi: ${bill.from}</p>
-            <p>Người nhận: ${bill.to}</p>
-            <p>Số tiền được chuyển: + ${bill.receive}</p>
-            <p>Phí: ${bill.fee}</p>
-            <p>Số dư: ${bill.balance}</p>
-            <p>Nội dung: ${bill.note}</p>
-            <p>Ngày tạo: ${date}</p>
-
-    `,
+    html: `<h3> 
+            Click vào đây để khôi phục mật khẩu: </h3>`,
   });
 };

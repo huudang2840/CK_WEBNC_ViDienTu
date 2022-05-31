@@ -66,9 +66,10 @@
 
                
                 <% break; } %>
-            
+                
                 <td class="totalBill"><%= h.add_money %>,<%= h.sub_money %>,<%= h.fee %></td>
                 <td><%= h.create_at %></td>
+
                 <% switch ( h.status ) { case 'waiting' : %>
                 <td>Chờ phê duyệt</td>
                 <% break; case 'done' : %>
@@ -76,6 +77,7 @@
                 <% break; case 'deny' : %>
                 <td>Từ chối</td>
                 <% break; } %>
+                
               </tr>
         
               <% }%>
