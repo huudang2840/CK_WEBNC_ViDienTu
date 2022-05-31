@@ -28,5 +28,5 @@ function formatVND(money) {
 }
 
 function displayVND(name) {
-  name[0].innerHTML = formatVND(Number(name[0].innerHTML));
+  name[0].innerHTML = formatVND(Number(name[0].innerHTML()));
 }

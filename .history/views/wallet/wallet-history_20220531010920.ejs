@@ -42,7 +42,7 @@
               </tr>
             </thead>
             <tbody>
-              <% for (var i = 0; i < history.length-1; i++) { let h = history[i];%>
+              <% for (var i = 0; i < history.length; i++) { let h = history[i];%>
             
                 <th ><%= i %></th>
 
@@ -73,7 +73,7 @@
                 <% switch ( h.status ) { case 'waiting' : %>
                 <td>Chờ phê duyệt</td>
                 <% break; case 'done' : %>
-                <td>Hoàn thành</td>
+                <td>Hoành thành</td>
                 <% break; } %>
                 
               </tr>
@@ -82,7 +82,7 @@
             </tbody>
           </table>
           </div>
-       
+        </div>
       </div>
     </section>
 

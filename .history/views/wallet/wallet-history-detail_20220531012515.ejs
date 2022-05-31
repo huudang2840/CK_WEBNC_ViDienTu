@@ -26,6 +26,7 @@
           <h2 class="balance"><%= wallet.account_balance %></h2>
         </div>
       </div>
+
       <div class="container">
         <div class="service_container layout_padding2">
           <div
@@ -38,7 +39,6 @@
               background: #80008044;
             "
           >
-            <p style="text-align: center"><img src="/images/s1-blue.png" alt="" /></p>
             <h2 style="margin-top: 20px; color: #800080">Nạp tiền</h2>
             <p style="color: #800080">Nhập thông tin nạp thẻ</p>
             <form method="POST">
@@ -91,6 +91,31 @@
             </form>
           </div>
         </div>
+      </div>
+      <div class="container">
+        <h2>Thông tin chi tiết giao dịch</h2>
+        <h4>icon</h4>
+        <h4>Loại giao dịch: <%= history.type%></h4>
+        <% if (phone_card) {%>
+        <h4>Mã thẻ điện thoại:</h4>
+        <h4><%= phone_card.name %></h4>
+        <h4><%= phone_card.seri %></h4>
+        <h4><%= phone_card.money %></h4>
+
+        <%}%>
+
+        <h4>Từ: <%= history.from%></h4>
+        <h4>Đến: <%= history.to%></h4>
+        <h4>Phí: <%= history.fee%></h4>
+        <h4>Tiền giao dịch(Đã trừ phí):</h4>
+        <h4 class="totalBill">
+          <%= history.add_money %>,<%= history.sub_money %>,<%= history.fee %>
+        </h4>
+        <h4>Số dư sau khi giao dịch: <%= history.wallet_balance %></h4>
+        <h4>Nội dung:<%= history.contents %></h4>
+        <h4>Trạng thái:<%= history.status %></h4>
+
+        <h4>Ngày tạo: <%= history.create_at %></h4>
       </div>
     </section>
 

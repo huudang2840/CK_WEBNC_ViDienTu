@@ -5,10 +5,12 @@ let accountBalance = document.getElementsByClassName("balance");
 let moneyTransfer = document.getElementsByClassName("money_transfer");
 let fee = document.getElementsByClassName("fee");
 let balanceAfter = document.getElementsByClassName("balance_after");
+console.log(balanceAfter);
 
 displayVND(accountBalance);
 displayVND(moneyTransfer);
 displayVND(fee);
+// displayVND(balanceAfter);
 
 function totalBillWallet(bill) {
   for (let i = 0; i < bill.length; i++) {

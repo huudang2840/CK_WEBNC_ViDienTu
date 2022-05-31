@@ -94,31 +94,28 @@
             <p style="font-size: 20px"><%= phone_card.name %></p>
             <h4>Mã thẻ:</h4>
             <p style="font-size: 20px"><%= phone_card.seri %></p>
-            <h4>Mệnh giá:</h4>
-            <p style="font-size: 20px"><%= phone_card.money %></p>
+
+            <h4>Mệnh giá: <%= phone_card.money %></h4>
+            <p style="font-size: 20px"><%= phone_card.seri %></p>
 
             <%}%> <% break; } %>
 
             <h4>Tiền giao dịch(Đã trừ phí):</h4>
-            <p style="font-size: 20px" class="totalBill">
+            <h4 class="totalBill">
               <%= history.add_money %>,<%= history.sub_money %>,<%= history.fee %>
-            </p>
+            </h4>
             <h4>Số dư sau khi giao dịch:</h4>
-            <p style="font-size: 20px" class="money_transfer"><%= history.wallet_balance %></p>
-            <h4>Nội dung:</h4>
-            <p style="font-size: 20px"><%= history.contents %></p>
+            <p class="money_transfer"><%= history.wallet_balance %></p>
+            <h4>Nội dung:<%= history.contents %></h4>
 
-            <h4>Trạng thái:</h4>
             <% if(history.status == "done"){ %>
-            <p style="font-size: 20px">Hoàn thành</p>
-
+            <h4>Trạng thái: Hoàn thành</h4>
             <% }%> <% if(history.status == "waiting"){ %>
-            <p style="font-size: 20px">Chờ phê duyệt</p>
+            <h4>Trạng thái: Chờ duyệt</h4>
             <% }%> <% if(history.status == "deny"){ %>
-            <p style="font-size: 20px">Từ chối</p>
+            <h4>Trạng thái: Từ chối</h4>
             <% }%>
-            <h4>Ngày tạo:</h4>
-            <p style="font-size: 20px"><%= history.create_at %></p>
+            <h4>Ngày tạo: <%= history.create_at %></h4>
           </div>
         </div>
       </div>

@@ -486,7 +486,6 @@ router.get("/history/:id", checkLogin, async function (req, res, next) {
     phone_card: phone_card,
     user: user,
     wallet: walletCurrent,
-    title: "Chi tiết lịch sử giao dịch",
   });
 });
 

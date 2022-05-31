@@ -114,11 +114,11 @@
 
             <% }%> <% if(history.status == "waiting"){ %>
             <p style="font-size: 20px">Chờ phê duyệt</p>
+
             <% }%> <% if(history.status == "deny"){ %>
-            <p style="font-size: 20px">Từ chối</p>
+            <h4>Trạng thái: Từ chối</h4>
             <% }%>
-            <h4>Ngày tạo:</h4>
-            <p style="font-size: 20px"><%= history.create_at %></p>
+            <h4>Ngày tạo: <%= history.create_at %></h4>
           </div>
         </div>
       </div>

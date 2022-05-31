@@ -5,6 +5,8 @@ let accountBalance = document.getElementsByClassName("balance");
 let moneyTransfer = document.getElementsByClassName("money_transfer");
 let fee = document.getElementsByClassName("fee");
 let balanceAfter = document.getElementsByClassName("balance_after");
+console.log(balanceAfter);
+displayVND(balanceAfter);
 
 displayVND(accountBalance);
 displayVND(moneyTransfer);

@@ -9,6 +9,7 @@ let balanceAfter = document.getElementsByClassName("balance_after");
 displayVND(accountBalance);
 displayVND(moneyTransfer);
 displayVND(fee);
+displayVND(balanceAfter);
 
 function totalBillWallet(bill) {
   for (let i = 0; i < bill.length; i++) {

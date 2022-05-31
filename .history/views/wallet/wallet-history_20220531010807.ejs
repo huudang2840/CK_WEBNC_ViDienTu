@@ -42,27 +42,27 @@
               </tr>
             </thead>
             <tbody>
-              <% for (var i = 0; i < history.length-1; i++) { let h = history[i];%>
+              <% for (var i = 0; i < history.length; i++) { let h = history[i];%>
             
                 <th ><%= i %></th>
 
                 <% switch ( h.type ) { case 'recharge' : %>
                 <td>  <img  style=" max-width: 30px"  src="/images/s1-blue.png" alt="" /> </td>
-                <td>Nạp tiền vào tài khoản<a href="/wallet/history/<%= h.id %>" >Chi tiết</a></td>
+                <td>Nạp tiền vào tài khoản<a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
 
 
                 <% break; case 'withdraw' : %>
                 <td> <img  style=" max-width: 30px"  src="/images/s2-blue.png" alt="" /></td>
-                <td> Rút tiền <a href="/wallet/history/<%= h.id %>" >Chi tiết</a></td>
+                <td> Rút tiền <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
                 
 
                 <% break; case 'transfer' : %>
                 <td>  <img  style=" max-width: 30px"  src="/images/s3-blue.png" alt="" /> </td>
-                <td>Chuyển tiền <a href="/wallet/history/<%= h.id %>" >Chi tiết</a></td>
+                <td>Chuyển tiền <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
 
                 <% break; case 'phonecard' : %>
                 <td> <img style=" max-width: 30px" src="/images/s4-blue.png" alt="" /> </td>
-                <td>Mua thẻ điện thoại <a href="/wallet/history/<%= h.id %>" >Chi tiết</a></td>
+                <td>Mua thẻ điện thoại <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
 
                
                 <% break; } %>
@@ -73,7 +73,7 @@
                 <% switch ( h.status ) { case 'waiting' : %>
                 <td>Chờ phê duyệt</td>
                 <% break; case 'done' : %>
-                <td>Hoàn thành</td>
+                <td>Hoành thành</td>
                 <% break; } %>
                 
               </tr>
@@ -82,7 +82,7 @@
             </tbody>
           </table>
           </div>
-       
+        </div>
       </div>
     </section>
 
