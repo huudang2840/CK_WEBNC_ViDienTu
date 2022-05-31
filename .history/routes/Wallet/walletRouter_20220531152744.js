@@ -537,7 +537,7 @@ router.get("/phonecard", checkLogin, checkFirstLogin, async function (req, res, 
   });
 });
 
-router.post("/phonecard", checkLogin, checkFirstLogin, async function (req, res, next) {
+router.post("/phonecard", checkLogin, async function (req, res, next) {
   let { code_card, money_card, number_card } = req.body;
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
   let walletHistory = walletCurrent.history;
@@ -604,7 +604,7 @@ router.post("/phonecard", checkLogin, checkFirstLogin, async function (req, res,
 // Mua thẻ cào
 
 // Xem lịch sử giao dịch
-router.get("/history", checkLogin, checkFirstLogin, async function (req, res, next) {
+router.get("/history", checkLogin, async function (req, res, next) {
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
   let user = await Account.findOne({ username: req.session.username });
   let history = walletCurrent.history;
@@ -623,7 +623,7 @@ router.get("/history", checkLogin, checkFirstLogin, async function (req, res, ne
   });
 });
 
-router.get("/history/:id", checkLogin, checkFirstLogin, async function (req, res, next) {
+router.get("/history/:id", checkLogin, async function (req, res, next) {
   let user = await Account.findOne({ username: req.session.username });
   let id = req.params.id;
   let walletCurrent = await Wallet.findOne({

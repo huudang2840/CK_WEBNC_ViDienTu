@@ -623,7 +623,7 @@ router.get("/history", checkLogin, checkFirstLogin, async function (req, res, ne
   });
 });
 
-router.get("/history/:id", checkLogin, checkFirstLogin, async function (req, res, next) {
+router.get("/history/:id", checkLogin, async function (req, res, next) {
   let user = await Account.findOne({ username: req.session.username });
   let id = req.params.id;
   let walletCurrent = await Wallet.findOne({
