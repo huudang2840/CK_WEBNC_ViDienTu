@@ -126,7 +126,7 @@ router.post("/login", isAdmin, validatorLogin, function (req, res) {
             req.flash("type", "danger");
             req.flash(
               "message",
-              "Tài khoản đã bị khóa do nhập sai mật khẩu nhiều lần, vui lòng liên hệ quản trị viên để được hỗ trợ."
+              "Tài khoản bị khóa vô thời hạn!!! Vui lòng liên hệ nhân viên để hỗ trợ"
             );
             return res.redirect("/user/login");
           }
@@ -136,7 +136,7 @@ router.post("/login", isAdmin, validatorLogin, function (req, res) {
               req.flash("type", "danger");
               req.flash(
                 "message",
-                "Tài khoản đã bị khóa do nhập sai mật khẩu nhiều lần, vui lòng liên hệ quản trị viên để được hỗ trợ."
+                "Tài khoản bị khóa vô thời hạn!!! Vui lòng liên hệ nhân viên để hỗ trợ"
               );
               return res.redirect("/user/login");
             } else {
@@ -147,19 +147,11 @@ router.post("/login", isAdmin, validatorLogin, function (req, res) {
             }
           }
         } else {
-          if (acc.verifyAccount === "disable") {
-            req.flash("type", "danger");
-            req.flash(
-              "message",
-              "Tài khoản này đã bị vô hiệu hóa, vui lòng liên hệ tổng đài 18001008”."
-            );
-            return res.redirect("/user/login");
-          }
           if (acc.lockAccount === true) {
             req.flash("type", "danger");
             req.flash(
               "message",
-              "Tài khoản đã bị khóa do nhập sai mật khẩu nhiều lần, vui lòng liên hệ quản trị viên để được hỗ trợ."
+              "Tài khoản bị khóa vô thời hạn!!! Vui lòng liên hệ nhân viên để hỗ trợ"
             );
             return res.redirect("/user/login");
           } else {
@@ -387,7 +379,7 @@ router.get("/profile", checkLogin, async (req, res) => {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
-  res.render("wallet/profile", { wallet: wallet, user: user, title: "Thông tin cá nhân" });
+  res.render("wallet/profile", { wallet: wallet, user: user, title: "Rut tiền" });
 });
 
 router.get("/firstlogin", checkLogin, (req, res) => {

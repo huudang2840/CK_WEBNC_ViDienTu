@@ -147,7 +147,7 @@ router.post("/login", isAdmin, validatorLogin, function (req, res) {
             }
           }
         } else {
-          if (acc.verifyAccount === "disable") {
+          if (acc.lockAccount === true) {
             req.flash("type", "danger");
             req.flash(
               "message",
@@ -387,7 +387,7 @@ router.get("/profile", checkLogin, async (req, res) => {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
-  res.render("wallet/profile", { wallet: wallet, user: user, title: "Thông tin cá nhân" });
+  res.render("wallet/profile", { wallet: wallet, user: user, title: "Rut tiền" });
 });
 
 router.get("/firstlogin", checkLogin, (req, res) => {
