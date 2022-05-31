@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách tài khoản đang chờ kích hoạt</title>
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="/stylesheets/admin/updating.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+
 </head>
 <body>
     <div class = "sidebar">
@@ -74,6 +75,8 @@
                         <i class='bx bxs-user' ></i>
                     </label>
                     Admin
+                    <a href="/admin/logout">Đăng xuất</a>
+
                 </h5>
             </div>
         </nav>
@@ -104,8 +107,8 @@
                                 <h5><%=e.username%></h5>
                         
                             </td>
-                            <td class="state">
-                                <p>Đang chờ cập nhật</p>
+                            <td class="state" >
+                                <p style="background:yellow">Đang chờ cập nhật</p>
                             </td>
                         </tr>
                      <%  }) %>

@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const credentials = require("./credentials");
 const mongoose = require("mongoose");
+const checkLogin = require("./auth/CheckLogin");
+const checkNotUser = require("./auth/CheckNotUser");
 
 const indexRouter = require("./routes/index");
 const userRouter = require("./routes/Users/userRouter");
@@ -13,7 +15,6 @@ const walletRouter = require("./routes/Wallet/walletRouter");
 const adminRouter = require("./routes/Admin/adminRouter");
 
 
-const checkAdmin = require("./middlerwares/checkAdmin")
 
 const app = express();
 
@@ -51,7 +52,7 @@ mongoose.connect(credentials.mongo.development.connectionString, opts).then(
 
 app.use("/", indexRouter);
 
-app.use("/user", userRouter);
+app.use("/user" ,checkNotUser, userRouter);
 app.use("/wallet", walletRouter);
 app.use("/admin", adminRouter);
 

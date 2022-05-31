@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách thông tin chi tiết của tài khoản</title>
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="/stylesheets/admin/account.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
 
 </head>
 <body>
@@ -74,6 +74,7 @@
                         <i class='bx bxs-user' ></i>
                     </label>
                     Admin
+                    <a href="/admin/logout">Đăng xuất</a>
                 </h5>
             </div>
         </nav>
@@ -104,8 +105,8 @@
                             <h5><%=e.username%></h5>
                     
                         </td>
-                        <td class="state">
-                            <p>Chờ xác minh</p>
+                        <td class="state" >
+                            <p style="background:yellow">Chờ xác minh</p>
                         </td>
                     </tr>
                  <%  }) %>

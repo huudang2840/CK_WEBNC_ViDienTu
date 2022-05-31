@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Danh sách các giao dịch đang chờ phê duyệt </title>
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="/stylesheets/admin/approveTransaction.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+
 
 </head>
 <body>
@@ -73,6 +74,9 @@
                         <i class='bx bxs-user' ></i>
                     </label>
                     Admin
+                    <a href="/admin/logout">Đăng xuất</a>
+
+
                 </h5>
             </div>
         </nav>
@@ -88,6 +92,7 @@
                         <td><h5>Username</h5></td>
                         <td><h5>Hình thức</h5></td>
                         <td><h5>Số tiền</h5></td>
+                        <td><h5>Ngày yêu cầu</h5></td>
                         <td><h5>Trạng thái</h5></td>
                         <td></td>
                     </tr>
@@ -114,9 +119,9 @@
                           
                             <td class="totalBill"><%= e.add_money %>,<%= e.sub_money %>,<%= e.fee %></td>
                             
-                            
-                            <td class="state">
-                                <p>Đang chờ xét duyệt</p>
+                            <td class="date"><%=e.create_at %></td>
+                            <td class="state" >
+                                <p style="background:yellow">Đang chờ xét duyệt</p>
                             </td>
                             <td class="detail">
                                 <a  href="/admin/detailTransaction/<%=e.id%>%>">Xem chi tiết</a>
