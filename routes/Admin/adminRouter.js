@@ -75,8 +75,10 @@ router.get("/infoUser/:username",async (req, res)=>{
         }else if(user.verifyAccount=="updating"){
             state = "Đang chờ cập nhật"
         }
-        //sửa account balance
-        return res.render("admin/infoUser",{user:user, balance :userWallet.account_balance, history:userWallet.history})
+  
+    let historySort = userWallet.history.sort((dateA, dateB) => dateA.create_at - dateB.create_at);
+ 
+        return res.render("admin/infoUser",{user:user, balance :userWallet.account_balance, history:historySort})
     }
     else {
         return res.send("Không tìm thấy user")
@@ -265,9 +267,7 @@ router.get('/deniedTransaction/:owner/:id', async (req,res)=>{
 })
 
 
-router.get('/userinfo',(req, res) => {
-    res.render('admin/userInfo')
-})
+
 function makeHistory(type, from, to, add_money, sub_money, fee, wallet_balance, contents, status) {
     return {
       id:  randomHistory(),
