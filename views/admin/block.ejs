@@ -6,10 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách tài khoản bị khóa vô thời hạn</title>
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="/stylesheets/admin/block.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+
+
 </head>
 <body>
     <div class = "sidebar">
@@ -19,7 +18,7 @@
         </div>
         <ul class="nav-links">
             <li>
-                <a href="/admin/waiting">
+                <a href="/admin">
                     <i class='bx bxs-time'></i>
                     <span class="link-name">Danh sách tài khoản đang chờ kích hoạt</span>
                 </a>
@@ -76,7 +75,8 @@
                         <i class='bx bxs-user' ></i>
                     </label>
                     Admin
-                    <a href="/user/logout">Đăng xuất</a>
+                    <a href="/admin/logout">Đăng xuất</a>
+
 
                 </h5>
             </div>
@@ -112,8 +112,8 @@
                             <td class="dateBlock">
                                 <h5><%=e.update_at%></h5>
                             </td>
-                            <td class="state">
-                                <p id="status">Khóa vô thời hạn</p>
+                            <td class="state" >
+                                <p style="background:red">Khóa vô thời hạn</p>
                                 
                             </td>
                         </tr>

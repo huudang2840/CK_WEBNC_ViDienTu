@@ -12,7 +12,7 @@ const crypto = require("crypto");
 const multer = require("multer");
 const checkLogin = require("../../auth/CheckLogin");
 const isAdmin = require("../../auth/isAdmin");
-
+const checkNotUser = require("../../auth/CheckNotUser");
 
 
 // Upload file ảnh

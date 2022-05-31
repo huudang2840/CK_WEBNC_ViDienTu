@@ -14,45 +14,40 @@ const isAdmin = require("../../auth/isAdmin");
 const checkAdmin = require("../../auth/CheckAdmin");
 
 // Hiển thị danh sách tài khoản đang đơi xác minh
-router.get("/", checkLogin, checkAdmin, async (req, res, next) => {
+router.get("/", checkLogin, checkAdmin async (req, res, next) => {
   let userUnactive = await Account.find({ verifyAccount: "waiting", lockAccount: false }).exec();
   console.log(userUnactive);
   return res.render("admin/account", { userUnactive: userUnactive });
 });
 
-router.get("/account", checkLogin, checkAdmin, async (req, res, next) => {
-    let userUnactive = await Account.find({ verifyAccount: "waiting", lockAccount: false }).exec();
-    console.log(userUnactive);
-    return res.render("admin/account", { userUnactive: userUnactive });
-  });
-router.get("/updating", checkLogin, checkAdmin, async (req, res, next) => {
+router.get("/updating", async (req, res, next) => {
   let userUpdating = await Account.find({ verifyAccount: "updating", lockAccount: false }).exec();
   let userSort = userUpdating.sort((dateA, dateB) => dateB.update_at - dateA.update_at);
   return res.render("admin/updating", { userSort: userSort });
 });
 //Hiển thị danh sách tài khoản đã xác minh
-router.get("/active", checkLogin, checkAdmin, async (req, res, next) => {
+router.get("/active", async (req, res, next) => {
   let userActive = await Account.find({ verifyAccount: "done" }).exec();
   let userSort = userActive.sort((dateA, dateB) => dateB.update_at - dateA.update_at);
   return res.render("admin/active", { userSort: userSort });
 });
 
 // Hiển thị danh sách tài khoản bị vô hiệu hóa
-router.get("/disable", checkLogin, checkAdmin, async (req, res, next) => {
+router.get("/disable", async (req, res, next) => {
   let userDisable = await Account.find({ verifyAccount: "disable", lockAccount: false }).exec();
   let userSort = userDisable.sort((dateA, dateB) => dateB.update_at - dateA.update_at);
   return res.render("admin/disable", { userSort: userSort });
 });
 
 // Hiển thị danh sách tài khoản  bị khóa vô thời hạn
-router.get("/block", checkLogin, checkAdmin, async (req, res, next) => {
+router.get("/block", async (req, res, next) => {
   let userBlock = await Account.find({ lockAccount: true }).exec();
   let userSort = userBlock.sort((dateA, dateB) => dateB.update_at - dateA.update_at);
   return res.render("admin/block", { userSort: userSort });
 });
 
 // Xem thông tin chi tiết của một user
-router.get("/infoUser/:username", checkLogin, checkAdmin, async (req, res) => {
+router.get("/infoUser/:username", async (req, res) => {
   let username = req.params.username;
   let history, state;
   let block = false;
@@ -75,7 +70,7 @@ router.get("/infoUser/:username", checkLogin, checkAdmin, async (req, res) => {
     //sửa account balance
     return res.render("admin/infoUser", {
       user: user,
-      balance: userWallet.account_balance,
+      balance: account_balance,
       state: state,
       block: block,
       history: userWallet.history,
@@ -86,7 +81,7 @@ router.get("/infoUser/:username", checkLogin, checkAdmin, async (req, res) => {
 });
 
 // Mở khóa tài khoản bị khóa vĩnh viễn
-router.get("/unblock/:username", checkLogin, checkAdmin, async (req, res) => {
+router.get("/unblock/:username", async (req, res) => {
   let username = req.params.username;
   let user = await Account.findOne({ username: username, lockAccount: true }).exec();
   if (user) {
@@ -101,7 +96,7 @@ router.get("/unblock/:username", checkLogin, checkAdmin, async (req, res) => {
 });
 
 // Xác minh tài khoản
-router.get("/active/:username", checkLogin, checkAdmin, async (req, res) => {
+router.get("/active/:username", async (req, res) => {
   let username = req.params.username;
   let user = await Account.findOne({ username: username }).exec();
   if (user) {
@@ -113,7 +108,7 @@ router.get("/active/:username", checkLogin, checkAdmin, async (req, res) => {
 });
 
 // Hủy => Vô hiệu hóa
-router.get("/disable/:username", checkLogin, checkAdmin, async (req, res) => {
+router.get("/disable/:username", async (req, res) => {
   let username = req.params.username;
   let user = await Account.findOne({ username: username }).exec();
   if (user) {
@@ -125,7 +120,7 @@ router.get("/disable/:username", checkLogin, checkAdmin, async (req, res) => {
 });
 
 //yêu cầu cập nhật CMND => Chờ cập nhật
-router.get("/updating/:username", checkLogin, checkAdmin, async (req, res) => {
+router.get("/updating/:username", async (req, res) => {
   let username = req.params.username;
   let user = await Account.findOne({ username: username }).exec();
   if (user) {
@@ -137,7 +132,7 @@ router.get("/updating/:username", checkLogin, checkAdmin, async (req, res) => {
 });
 
 // Xem danh sách các giao dịch cần phê duyệt
-router.get("/approveTransaction", checkLogin, checkAdmin, async (req, res) => {
+router.get("/approveTransaction", async (req, res) => {
   let waitingTransaction = [];
   let transaction = await Wallet.find().exec();
   transaction.forEach((e) => {
@@ -151,7 +146,7 @@ router.get("/approveTransaction", checkLogin, checkAdmin, async (req, res) => {
 });
 
 //Chi tiết của giao dịch
-router.get("/detailTransaction/:id", checkLogin, checkAdmin, async (req, res) => {
+router.get("/detailTransaction/:id", async (req, res) => {
   let id = req.params.id;
   let transaction = await Wallet.find().exec();
   let a;
@@ -167,7 +162,7 @@ router.get("/detailTransaction/:id", checkLogin, checkAdmin, async (req, res) =>
 });
 
 //Chấp nhập giao dịch
-router.get("/acceptTransaction/:owner/:id", checkLogin, checkAdmin, async (req, res) => {
+router.get("/acceptTransaction/:owner/:id", async (req, res) => {
   let id = req.params.id;
   let owner = req.params.owner;
   let a; //Lịch sử giao dịch lấy từ người gửi
@@ -263,7 +258,7 @@ router.get("/acceptTransaction/:owner/:id", checkLogin, checkAdmin, async (req, 
 });
 
 //Không chấp nhận giao dịch
-router.get("/deniedTransaction/:id", checkLogin, checkAdmin, async (req, res) => {
+router.get("/deniedTransaction/:id", async (req, res) => {
   let wallet = await Wallet.findOne({ owner: owner }).exec();
   // console.log(wallet)
   let history = wallet.history;
@@ -289,13 +284,6 @@ router.get("/deniedTransaction/:id", checkLogin, checkAdmin, async (req, res) =>
   }
   res.redirect("admin/approveTransaction");
 });
-
-
-router.get("/logout", (req, res) => {
-    req.session.destroy();
-    return res.redirect("/user/login");
-  });
-
 function makeHistory(type, from, to, add_money, sub_money, fee, wallet_balance, contents, status) {
   return {
     id: randomHistory(),
@@ -313,15 +301,8 @@ function makeHistory(type, from, to, add_money, sub_money, fee, wallet_balance, 
   };
 }
 
-
-
-
 function randomHistory() {
   return Math.floor(Date.now() + 100000 + Math.random() * 900000);
 }
 
 module.exports = router;
-
-
-
-sortByM

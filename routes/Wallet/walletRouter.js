@@ -5,10 +5,10 @@ const Card = require("../../models/CardModel");
 const Wallet = require("../../models/WalletModel");
 const Otp = require("../../models/OTPModel");
 const mailer = require("../../sendMail");
-
+const checkNotUser = require("../../auth/CheckNotUser")
 const checkLogin = require("../../auth/CheckLogin");
 
-router.get("/", checkLogin, async function (req, res, next) {
+router.get("/", checkLogin, checkNotUser, async function (req, res, next) {
   let username = req.session.username;
   let user = findUser(username);
   let wallet;
@@ -30,7 +30,7 @@ router.get("/", checkLogin, async function (req, res, next) {
 });
 
 // Nạp tiền
-router.get("/recharge", checkLogin, async function (req, res, next) {
+router.get("/recharge", checkLogin, checkNotUser, async function (req, res, next) {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
@@ -47,7 +47,7 @@ router.get("/recharge", checkLogin, async function (req, res, next) {
   });
 });
 
-router.post("/recharge", checkLogin, async function (req, res, next) {
+router.post("/recharge", checkLogin, checkNotUser, async function (req, res, next) {
   let { number_card, CVV, add_money } = req.body;
   let username = req.session.username;
   let wallet = await findWallet(username);
@@ -96,7 +96,7 @@ router.post("/recharge", checkLogin, async function (req, res, next) {
 });
 
 // Rút tiền
-router.get("/withdraw", checkLogin, async function (req, res, next) {
+router.get("/withdraw", checkLogin,checkNotUser, async function (req, res, next) {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
@@ -113,7 +113,7 @@ router.get("/withdraw", checkLogin, async function (req, res, next) {
   });
 });
 
-router.post("/withdraw", checkLogin, async function (req, res, next) {
+router.post("/withdraw", checkLogin, checkNotUser, async function (req, res, next) {
   let { number_card, CVV, date, sub_money, notes } = req.body;
   let username = req.session.username;
   let wallet = await findWallet(username);
@@ -195,7 +195,7 @@ router.post("/withdraw", checkLogin, async function (req, res, next) {
 });
 
 // Chuyển tiền
-router.get("/transfer", checkLogin, async function (req, res, next) {
+router.get("/transfer", checkLogin, checkNotUser, async function (req, res, next) {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
@@ -212,7 +212,7 @@ router.get("/transfer", checkLogin, async function (req, res, next) {
   });
 });
 
-router.post("/transfer", checkLogin, async function (req, res, next) {
+router.post("/transfer", checkLogin, checkNotUser, async function (req, res, next) {
   let { phone, money_transfer, notes } = req.body;
   let userReceive = await Account.findOne({ phone: phone }).exec();
   let walletUserCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
@@ -252,7 +252,7 @@ router.post("/transfer", checkLogin, async function (req, res, next) {
 });
 
 // Xác thực OTP
-router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
+router.post("/transfer-OTP", checkLogin, checkNotUser, async function (req, res, next) {
   let { money_transfer, phone, notes, fee, person_pay, otp } = req.body;
   console.log(money_transfer, phone, notes, fee, person_pay, otp);
   let userCurrent = await Account.findOne({ username: req.session.username }).exec();
@@ -437,7 +437,7 @@ router.post("/transfer-OTP", checkLogin, async function (req, res, next) {
   }
 });
 
-router.post("/transfer-confirm", checkLogin, async function (req, res, next) {
+router.post("/transfer-confirm", checkLogin, checkNotUser, async function (req, res, next) {
   let { money_transfer, phone, notes, fee, person_pay } = req.body;
   let userCurrent = await Account.findOne({ username: req.session.username }).exec();
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
@@ -477,7 +477,7 @@ router.post("/transfer-confirm", checkLogin, async function (req, res, next) {
 // Chuyển tiền
 
 // Mua thẻ cào
-router.get("/phonecard", checkLogin, async function (req, res, next) {
+router.get("/phonecard", checkLogin,checkNotUser, async function (req, res, next) {
   let username = req.session.username;
   let user = await Account.findOne({ username: username });
   let wallet = await Wallet.findOne({ owner: username });
@@ -494,7 +494,7 @@ router.get("/phonecard", checkLogin, async function (req, res, next) {
   });
 });
 
-router.post("/phonecard", checkLogin, async function (req, res, next) {
+router.post("/phonecard", checkLogin, checkNotUser, async function (req, res, next) {
   let { code_card, money_card, number_card } = req.body;
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
   let walletHistory = walletCurrent.history;
@@ -560,7 +560,7 @@ router.post("/phonecard", checkLogin, async function (req, res, next) {
 // Mua thẻ cào
 
 // Xem lịch sử giao dịch
-router.get("/history", checkLogin, async function (req, res, next) {
+router.get("/history", checkLogin, checkNotUser, async function (req, res, next) {
   let walletCurrent = await Wallet.findOne({ owner: req.session.username }).exec();
   let user = await Account.findOne({ username: req.session.username });
   let history = walletCurrent.history;
@@ -579,7 +579,7 @@ router.get("/history", checkLogin, async function (req, res, next) {
   });
 });
 
-router.get("/history/:id", checkLogin, async function (req, res, next) {
+router.get("/history/:id", checkLogin, checkNotUser, async function (req, res, next) {
   let user = await Account.findOne({ username: req.session.username });
   let id = req.params.id;
   let walletCurrent = await Wallet.findOne({

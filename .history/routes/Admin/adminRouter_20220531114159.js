@@ -20,11 +20,6 @@ router.get("/", checkLogin, checkAdmin, async (req, res, next) => {
   return res.render("admin/account", { userUnactive: userUnactive });
 });
 
-router.get("/account", checkLogin, checkAdmin, async (req, res, next) => {
-    let userUnactive = await Account.find({ verifyAccount: "waiting", lockAccount: false }).exec();
-    console.log(userUnactive);
-    return res.render("admin/account", { userUnactive: userUnactive });
-  });
 router.get("/updating", checkLogin, checkAdmin, async (req, res, next) => {
   let userUpdating = await Account.find({ verifyAccount: "updating", lockAccount: false }).exec();
   let userSort = userUpdating.sort((dateA, dateB) => dateB.update_at - dateA.update_at);
@@ -75,7 +70,7 @@ router.get("/infoUser/:username", checkLogin, checkAdmin, async (req, res) => {
     //sửa account balance
     return res.render("admin/infoUser", {
       user: user,
-      balance: userWallet.account_balance,
+      balance: account_balance,
       state: state,
       block: block,
       history: userWallet.history,
@@ -289,13 +284,6 @@ router.get("/deniedTransaction/:id", checkLogin, checkAdmin, async (req, res) =>
   }
   res.redirect("admin/approveTransaction");
 });
-
-
-router.get("/logout", (req, res) => {
-    req.session.destroy();
-    return res.redirect("/user/login");
-  });
-
 function makeHistory(type, from, to, add_money, sub_money, fee, wallet_balance, contents, status) {
   return {
     id: randomHistory(),
@@ -313,15 +301,8 @@ function makeHistory(type, from, to, add_money, sub_money, fee, wallet_balance, 
   };
 }
 
-
-
-
 function randomHistory() {
   return Math.floor(Date.now() + 100000 + Math.random() * 900000);
 }
 
 module.exports = router;
-
-
-
-sortByM
