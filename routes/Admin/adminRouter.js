@@ -76,7 +76,7 @@ router.get("/infoUser/:username",async (req, res)=>{
             state = "Đang chờ cập nhật"
         }
         //sửa account balance
-        return res.render("admin/infoUser",{user:user, balance :account_balance, state:state, block:block, history:userWallet.history})
+        return res.render("admin/infoUser",{user:user, balance :userWallet.account_balance, history:userWallet.history})
     }
     else {
         return res.send("Không tìm thấy user")
@@ -245,18 +245,28 @@ router.get('/acceptTransaction/:owner/:id', async (req, res)=>{
 })
 
 //Không chấp nhận giao dịch 
-router.get('/deniedTransaction/:id', async (req,res)=>{
+router.get('/deniedTransaction/:owner/:id', async (req,res)=>{
+    let owner = req.params.owner
+    let id = req.params.id
     let wallet = await Wallet.findOne({owner: owner}).exec()
     // console.log(wallet)
-    let history = wallet.history
-    for(let i =0; i < history.length; i++){
-        if(history[i].id === id){
-            let j = history[i]
-            a = {id:j.id, type:j.type, from:j.from, to:j.to, add_money:j.add_money, sub_money:j.sub_money,fee:j.fee, wallet_balance:j.wallet_balance, contents: j.contents, status: "done", create_at:j.create_at, update_at:Date.now()}
-            history[i]= a
+    let history_after = wallet.history
+    let a
+    for(let i =1; i < history_after.length; i++){
+        console.log(history_after[i].id)
+        if(history_after[i].id === id){
+            let j = history_after[i]
+            a = {id:j.id, type:j.type, from:j.from, to:j.to, add_money:j.add_money, sub_money:j.sub_money,fee:j.fee, wallet_balance:j.wallet_balance, contents: j.contents, status: "deny", create_at:j.create_at, update_at:Date.now()}
+            history_after[i]= a
         }
     }
-    res.redirect("admin/approveTransaction")
+    await Wallet.findOneAndUpdate({owner: owner}, {history: history_after})
+    res.redirect("/admin/approveTransaction")
+})
+
+
+router.get('/userinfo',(req, res) => {
+    res.render('admin/userInfo')
 })
 function makeHistory(type, from, to, add_money, sub_money, fee, wallet_balance, contents, status) {
     return {

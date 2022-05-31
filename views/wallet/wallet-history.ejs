@@ -63,22 +63,16 @@
                 <% break; case 'phonecard' : %>
                 <td> <img style=" max-width: 30px" src="/images/s4-blue.png" alt="" /> </td>
                 <td>Mua thẻ điện thoại <a href="/userwallet/history/<%= h.id %>" >Chi tiết</a></td>
-
-               
                 <% break; } %>
-                
+            
                 <td class="totalBill"><%= h.add_money %>,<%= h.sub_money %>,<%= h.fee %></td>
                 <td><%= h.create_at %></td>
-
                 <% switch ( h.status ) { case 'waiting' : %>
                 <td>Chờ phê duyệt</td>
                 <% break; case 'done' : %>
-                <td>Hoành thành</td>
+                <td>Hoàn thành</td>
                 <% break; } %>
-                
               </tr>
-        
-        
               <% }%>
             </tbody>
           </table>
