@@ -258,7 +258,7 @@ router.get("/acceptTransaction/:owner/:id", checkLogin, checkAdmin, async (req, 
 });
 
 //Không chấp nhận giao dịch
-router.get("/deniedTransaction/:id", checkLogin, checkAdmin, async (req, res) => {
+router.get("/deniedTransaction/:id", async (req, res) => {
   let wallet = await Wallet.findOne({ owner: owner }).exec();
   // console.log(wallet)
   let history = wallet.history;

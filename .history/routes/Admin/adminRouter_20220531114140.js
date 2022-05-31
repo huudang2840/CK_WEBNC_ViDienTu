@@ -120,7 +120,7 @@ router.get("/disable/:username", checkLogin, checkAdmin, async (req, res) => {
 });
 
 //yêu cầu cập nhật CMND => Chờ cập nhật
-router.get("/updating/:username", checkLogin, checkAdmin, async (req, res) => {
+router.get("/updating/:username", async (req, res) => {
   let username = req.params.username;
   let user = await Account.findOne({ username: username }).exec();
   if (user) {
@@ -132,7 +132,7 @@ router.get("/updating/:username", checkLogin, checkAdmin, async (req, res) => {
 });
 
 // Xem danh sách các giao dịch cần phê duyệt
-router.get("/approveTransaction", checkLogin, checkAdmin, async (req, res) => {
+router.get("/approveTransaction", async (req, res) => {
   let waitingTransaction = [];
   let transaction = await Wallet.find().exec();
   transaction.forEach((e) => {
@@ -146,7 +146,7 @@ router.get("/approveTransaction", checkLogin, checkAdmin, async (req, res) => {
 });
 
 //Chi tiết của giao dịch
-router.get("/detailTransaction/:id", checkLogin, checkAdmin, async (req, res) => {
+router.get("/detailTransaction/:id", async (req, res) => {
   let id = req.params.id;
   let transaction = await Wallet.find().exec();
   let a;
@@ -162,7 +162,7 @@ router.get("/detailTransaction/:id", checkLogin, checkAdmin, async (req, res) =>
 });
 
 //Chấp nhập giao dịch
-router.get("/acceptTransaction/:owner/:id", checkLogin, checkAdmin, async (req, res) => {
+router.get("/acceptTransaction/:owner/:id", async (req, res) => {
   let id = req.params.id;
   let owner = req.params.owner;
   let a; //Lịch sử giao dịch lấy từ người gửi
@@ -258,7 +258,7 @@ router.get("/acceptTransaction/:owner/:id", checkLogin, checkAdmin, async (req, 
 });
 
 //Không chấp nhận giao dịch
-router.get("/deniedTransaction/:id", checkLogin, checkAdmin, async (req, res) => {
+router.get("/deniedTransaction/:id", async (req, res) => {
   let wallet = await Wallet.findOne({ owner: owner }).exec();
   // console.log(wallet)
   let history = wallet.history;

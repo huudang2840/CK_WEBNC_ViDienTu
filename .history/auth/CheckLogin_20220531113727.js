@@ -7,11 +7,11 @@ module.exports = async function (req, res, next) {
   if (!username) {
     return res.redirect("/user/login");
   }
-
-  // let user = await Account.findOne({ username: username }).exec();
-  // console.log(user.firstLogin);
-  // if (user.firstLogin) {
-  //   return res.redirect("/user/firstlogin");
-  // }
-  next();
+  if (username != "admin")
+    // let user = await Account.findOne({ username: username }).exec();
+    // console.log(user.firstLogin);
+    // if (user.firstLogin) {
+    //   return res.redirect("/user/firstlogin");
+    // }
+    next();
 };

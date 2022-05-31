@@ -1,11 +1,8 @@
-const Account = require("../models/Account");
-
 module.exports = async function (req, res, next) {
   let username = req.session.username;
 
-  console.log("user" + username);
-  if (!username) {
-    return res.redirect("/user/login");
+  if (username != "admin") {
+    return res.redirect("/wallet");
   }
 
   // let user = await Account.findOne({ username: username }).exec();
